@@ -1,6 +1,6 @@
 # F1 Prediction Engine
 
-AI-powered Formula 1 race prediction system using 75 years of historical data, multi-dimensional ELO ratings, Monte Carlo simulation, and XGBoost machine learning.
+AI-powered Formula 1 race prediction system using 75 years of historical data, multi-dimensional ELO ratings, Monte Carlo simulation, and XGBoost machine learning. 150-feature model with 3.0 position MAE, 92% podium accuracy, and 97% winner accuracy.
 
 Inspired by [theGreenCoding's tennis prediction model](https://github.com/theGreenCoding) that achieved 85% accuracy at the Australian Open.
 
@@ -18,7 +18,7 @@ Inspired by [theGreenCoding's tennis prediction model](https://github.com/theGre
 ### Data Pipeline
 
 ```
-Ingest (3 sources) → Feature Engineering (81+ features) → XGBoost Train → Predict → Monte Carlo Sim → Dashboard
+Ingest (3 sources) → Feature Engineering (150 features) → XGBoost Train → Predict → Monte Carlo Sim → Dashboard
 ```
 
 ### Data Sources
@@ -44,18 +44,33 @@ Adapted from chess for multi-player motorsport — each race generates (n*(n-1))
 
 ELO ratings are rebuilt chronologically from history and updated after each race/qualifying session.
 
-### Feature Matrix (81+ features per driver per race)
+### Feature Matrix (150 features per driver per race)
 
-- ELO ratings and differentials (6 dimensions)
+**130 base features:**
+
+- ELO ratings and differentials (6 dimensions: overall, circuit-type, qualifying, wet, constructor, teammate H2H)
 - Rolling form windows (last 3/5/10/20 races)
-- Circuit-specific performance history
+- Circuit-specific performance (EWM position, positions gained, win streak, qualifying history at circuit)
+- Circuit DNA (grid-position correlation, front row win rate, attrition rate, position variance)
+- Grid × circuit interactions (grid weighted by correlation, importance score, expected finish)
+- Constructor-at-circuit history (average, recent trend, race count)
+- Cumulative championship standings (points to leader, WDC/WCC position per round)
+- Compromised finish detection (z-score based, flags races where driver lost abnormally many positions)
 - Grid position and qualifying pace
-- Season momentum and trend
+- Season momentum (EWM, form vs season average)
 - Tire degradation and strategy (2018+)
-- Weather conditions
-- Constructor strength
-- Practice session pace (FastF1)
-- Safety car probability by circuit type
+- Weather conditions (auto-detected from FastF1)
+- Constructor strength and development trajectory
+- DNF risk indicators (mechanical reliability, crash history, DNF streak)
+- Teammate comparison (ELO diff, qualifying H2H win rate, positions gained delta)
+- Pit stop efficiency (team average, clean stop rate)
+
+**20 FastF1 features (2018+):**
+
+- Practice session pace (FP1/FP2/FP3 gap to leader)
+- FP2 long run analysis (race pace indicator, tire degradation rate)
+- Track status performance (SC/VSC gains)
+- Sector times and speed trap data
 
 ### Model
 
@@ -68,12 +83,22 @@ ELO ratings are rebuilt chronologically from history and updated after each race
 
 Trained with time-series cross-validation to prevent data leakage. Features are extracted at the state *before* each race (no future information).
 
+**Current metrics (9,467-row dataset, 1950–2025):**
+
+| Metric | Value |
+|--------|-------|
+| Position MAE | 3.019 |
+| Podium accuracy | 92.2% |
+| Winner accuracy | 96.6% |
+
 ### Monte Carlo Simulation
 
 10,000 vectorized simulations (NumPy) per race weekend:
 - Position noise with correlated team effects
 - DNF sampling using circuit-type-aware probabilities
-- Safety car probability by circuit type
+- Multi-car incidents (Gaussian-weighted grid position sampling, circuit-type-aware rates)
+- Pit strategy variance and safety car probability by circuit type
+- Wet conditions modifier
 - Outputs: win%, podium%, points%, expected points, median position, IQR range
 
 ## Quick Start
@@ -143,7 +168,7 @@ python -m data.dashboard
 │   │   └── openf1_penalties.py  # Penalty data extraction
 │   ├── features/                # Feature engineering
 │   │   ├── elo.py               # Multi-dimensional ELO system
-│   │   └── engineer.py          # Full feature matrix builder (81+ features)
+│   │   └── engineer.py          # Full feature matrix builder (150 features)
 │   ├── models/                  # ML models
 │   │   ├── predictor.py         # XGBoost stacking ensemble
 │   │   ├── simulator.py         # 10k Monte Carlo simulation
@@ -174,13 +199,17 @@ python -m data.dashboard
 - [x] FastF1 granular data ingestion (2018+)
 - [x] OpenF1 real-time client (2023+)
 - [x] Multi-dimensional ELO rating system (6 dimensions)
-- [x] Feature engineering pipeline (81+ features)
+- [x] Feature engineering pipeline (150 features)
 - [x] XGBoost stacking ensemble (position, podium, winner, points, DNF)
-- [x] Monte Carlo simulation (10k sims, vectorized)
+- [x] Monte Carlo simulation (10k sims, vectorized, multi-car incidents)
 - [x] Web dashboard (Flask, 4-column terminal aesthetic)
 - [x] Terminal dashboard (Rich)
 - [x] macOS double-click launchers
-- [ ] Wet race detection (automated from weather data)
+- [x] Wet race detection (auto-detected from FastF1 weather data)
+- [x] Circuit DNA features (grid correlation, attrition, front row rates)
+- [x] Circuit-specific driver/constructor history (EWM, streaks, qualifying)
+- [x] Compromised finish detection (z-score based)
+- [x] Cumulative per-round championship standings
+- [x] Betting odds integration and value detection
 - [ ] Real-time race predictions during qualifying/race
 - [ ] Championship probability simulations (full season Monte Carlo)
-- [ ] Betting odds integration and value detection
