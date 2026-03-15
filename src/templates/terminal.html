@@ -176,71 +176,9 @@
     {% endif %}
   </div>
 
-  <!-- ===== COL 2: Qualifying + Sprint + Race Results ===== -->
+  <!-- ===== COL 2: Race Results + Sprint + Qualifying ===== -->
   <div class="panel">
-    {# Qualifying #}
-    <div class="section">
-      <div class="section-title">Qualifying <span class="tag">{{ season }} R{{ race_round }}</span></div>
-      {% if quali|length > 0 %}
-      <table>
-        <thead>
-          <tr>
-            <th class="c" style="width:24px">P</th>
-            <th>Driver</th>
-            <th class="r">Q1</th>
-            <th class="r">Q2</th>
-            <th class="r">Q3</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for i, row in quali.iterrows() %}
-          {% set p = row.position %}
-          <tr>
-            <td class="c {{ p|pos_class }}">{{ p|int if p == p else '-' }}</td>
-            <td><span class="tc" style="background:{{ team_color(row.constructor_id) }}"></span>{{ driver_name(row.driver_id) }}</td>
-            <td class="r dim">{{ row.q1|na }}</td>
-            <td class="r dim">{{ row.q2|na }}</td>
-            <td class="r">{{ row.q3|na }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% else %}
-      <p class="dim">No qualifying data</p>
-      {% endif %}
-    </div>
-
-    {# Sprint #}
-    {% if sprint is not none and sprint|length > 0 %}
-    <div class="section">
-      <div class="section-title">Sprint Race</div>
-      <table>
-        <thead>
-          <tr>
-            <th class="c" style="width:24px">P</th>
-            <th>Driver</th>
-            <th class="c">GRD</th>
-            <th class="r">Pts</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for i, row in sprint.iterrows() %}
-          {% set p = row.position %}
-          <tr>
-            <td class="c {{ p|pos_class }}">{{ p|int if p == p else '-' }}</td>
-            <td><span class="tc" style="background:{{ team_color(row.constructor_id) }}"></span>{{ driver_name(row.driver_id) }}</td>
-            <td class="c dim">{{ row.grid|int if row.grid == row.grid else '-' }}</td>
-            <td class="r">{{ row.points|int if row.points == row.points else 0 }}</td>
-            <td class="dim">{{ row.status|na }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-    {% endif %}
-
-    {# Race results with +/- column #}
+    {# Race results first (most important when available) #}
     <div class="section">
       <div class="section-title">Race Result <span class="tag">{{ event_name }}</span></div>
       {% if race|length > 0 %}
@@ -275,6 +213,68 @@
       </table>
       {% else %}
       <p class="dim">Race not completed yet</p>
+      {% endif %}
+    </div>
+
+    {# Sprint #}
+    {% if sprint is not none and sprint|length > 0 %}
+    <div class="section">
+      <div class="section-title">Sprint Race</div>
+      <table>
+        <thead>
+          <tr>
+            <th class="c" style="width:24px">P</th>
+            <th>Driver</th>
+            <th class="c">GRD</th>
+            <th class="r">Pts</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i, row in sprint.iterrows() %}
+          {% set p = row.position %}
+          <tr>
+            <td class="c {{ p|pos_class }}">{{ p|int if p == p else '-' }}</td>
+            <td><span class="tc" style="background:{{ team_color(row.constructor_id) }}"></span>{{ driver_name(row.driver_id) }}</td>
+            <td class="c dim">{{ row.grid|int if row.grid == row.grid else '-' }}</td>
+            <td class="r">{{ row.points|int if row.points == row.points else 0 }}</td>
+            <td class="dim">{{ row.status|na }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    {# Qualifying #}
+    <div class="section">
+      <div class="section-title">Qualifying <span class="tag">{{ season }} R{{ race_round }}</span></div>
+      {% if quali|length > 0 %}
+      <table>
+        <thead>
+          <tr>
+            <th class="c" style="width:24px">P</th>
+            <th>Driver</th>
+            <th class="r">Q1</th>
+            <th class="r">Q2</th>
+            <th class="r">Q3</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i, row in quali.iterrows() %}
+          {% set p = row.position %}
+          <tr>
+            <td class="c {{ p|pos_class }}">{{ p|int if p == p else '-' }}</td>
+            <td><span class="tc" style="background:{{ team_color(row.constructor_id) }}"></span>{{ driver_name(row.driver_id) }}</td>
+            <td class="r dim">{{ row.q1|na }}</td>
+            <td class="r dim">{{ row.q2|na }}</td>
+            <td class="r">{{ row.q3|na }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="dim">No qualifying data</p>
       {% endif %}
     </div>
   </div>

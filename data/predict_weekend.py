@@ -186,25 +186,36 @@ def inject_upcoming_race(season: int, race_round: int) -> str:
     quali = pd.read_parquet(DATA_DIR / "qualifying.parquet")
     q_race = quali[(quali["season"] == season) & (quali["round"] == race_round)]
 
-    if q_race.empty:
-        logger.error("No qualifying data for %d Round %d", season, race_round)
-        return circuit_id
+    def _placeholder(driver_id, driver_code, constructor_id, grid):
+        return {
+            "season": season, "round": race_round, "circuit_id": circuit_id,
+            "driver_id": driver_id, "driver_code": driver_code,
+            "constructor_id": constructor_id, "grid": grid,
+            "position": None, "points": 0, "status": "Pending",
+        }
 
-    # Build placeholder race result rows
     rows = []
-    for _, qrow in q_race.iterrows():
-        rows.append({
-            "season": season,
-            "round": race_round,
-            "circuit_id": circuit_id,
-            "driver_id": qrow["driver_id"],
-            "driver_code": qrow.get("driver_code", ""),
-            "constructor_id": qrow.get("constructor_id", "unknown"),
-            "grid": int(qrow.get("position", 0)),
-            "position": None,  # Unknown — this is what we predict
-            "points": 0,
-            "status": "Pending",
-        })
+    if not q_race.empty:
+        for _, qrow in q_race.iterrows():
+            rows.append(_placeholder(
+                qrow["driver_id"], qrow.get("driver_code", ""),
+                qrow.get("constructor_id", "unknown"), int(qrow.get("position", 0)),
+            ))
+    else:
+        # No qualifying yet — estimate grid from latest race lineup
+        logger.info("No qualifying data — estimating grid from latest race lineup")
+        target_season = season if (rr["season"] == season).any() else rr["season"].max()
+        latest = rr[rr["season"] == target_season]
+        lineup = latest[latest["round"] == latest["round"].max()].sort_values("position")
+        for grid_pos, (_, row) in enumerate(lineup.iterrows(), 1):
+            rows.append(_placeholder(
+                row["driver_id"], row.get("driver_code", ""),
+                row.get("constructor_id", "unknown"), grid_pos,
+            ))
+
+    if not rows:
+        logger.error("No driver data available for %d Round %d", season, race_round)
+        return circuit_id
 
     placeholder = pd.DataFrame(rows)
     combined = pd.concat([rr, placeholder], ignore_index=True)
@@ -397,20 +408,20 @@ def run_weekend_prediction(
     print(f"  {season} {event_name} — Race Prediction")
     print(f"{'='*60}\n")
 
-    # Step 1: Fetch session data
+    # Step 1: Fetch session data (may be empty for future races)
     print("Step 1: Fetching session data from FastF1...")
     weekend_laps = fetch_weekend_sessions(season, race_round, refresh=refresh)
     if weekend_laps.empty:
-        print("No session data available yet. Try again after sessions complete.")
-        return
+        print("  No session data available yet (race hasn't started).")
+        print("  Predicting from historical features only.")
+    else:
+        sessions_found = weekend_laps["session_type"].unique()
+        print(f"  Sessions loaded: {', '.join(sorted(sessions_found))}")
+        print(f"  Total laps: {len(weekend_laps)}")
 
-    sessions_found = weekend_laps["session_type"].unique()
-    print(f"  Sessions loaded: {', '.join(sorted(sessions_found))}")
-    print(f"  Total laps: {len(weekend_laps)}")
-
-    # Step 2: Update FastF1 laps
-    print("\nStep 2: Updating FastF1 laps database...")
-    update_fastf1_laps(weekend_laps)
+        # Step 2: Update FastF1 laps
+        print("\nStep 2: Updating FastF1 laps database...")
+        update_fastf1_laps(weekend_laps)
 
     # Step 3: Inject placeholder rows + rebuild feature matrix
     if rebuild_features:
@@ -499,7 +510,11 @@ def run_weekend_prediction(
 
 
 def auto_detect_next_race() -> tuple[int, int]:
-    """Detect the next upcoming race from the schedule."""
+    """Detect the next upcoming race from the schedule.
+
+    Skips rounds that already have race results in our data, so re-running
+    after a race correctly targets the next one.
+    """
     import fastf1
     from datetime import datetime
     from data.ingest.fastf1_ingest import setup_fastf1_cache
@@ -509,15 +524,26 @@ def auto_detect_next_race() -> tuple[int, int]:
     today = datetime.now()
     season = today.year
 
+    # Check which rounds already have results (read only season/round columns)
+    completed_rounds: set[int] = set()
+    rr_path = DATA_DIR / "race_results.parquet"
+    if rr_path.exists():
+        rr = pd.read_parquet(rr_path, columns=["season", "round"])
+        completed_rounds = set(
+            rr[rr["season"] == season]["round"].unique().astype(int)
+        )
+
     schedule = fastf1.get_event_schedule(season, include_testing=False)
     for _, event in schedule.iterrows():
         rnd = event.get("RoundNumber", 0)
         if rnd == 0:
             continue
+        rnd = int(rnd)
+        if rnd in completed_rounds:
+            continue
         event_date = pd.to_datetime(event["EventDate"])
-        # Race is on the event date or within the weekend
         if event_date.date() >= today.date():
-            return season, int(rnd)
+            return season, rnd
 
     # If all races passed, return last round
     last = schedule[schedule["RoundNumber"] > 0].iloc[-1]

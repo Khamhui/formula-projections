@@ -109,6 +109,7 @@ The easiest way — no terminal needed:
 
 - **`web-dashboard.command`** — Opens the web dashboard in your browser
 - **`dashboard.command`** — Opens the terminal (Rich) dashboard
+- **`auto-update.command`** — Checks for new results, retrains, predicts next race
 
 ### Command line
 
@@ -130,6 +131,35 @@ python -m data.predict_weekend
 python -m src.app                 # http://localhost:5050
 python -m src.app --port 8080     # Custom port
 ```
+
+## Auto-Update
+
+The model automatically detects new race results, retrains, and predicts the next race.
+
+```bash
+# Check for new results + update if needed
+python -m data.auto_update
+
+# Force full cycle (ingest → features → train → predict)
+python -m data.auto_update --force
+
+# Preview what would happen
+python -m data.auto_update --dry-run
+
+# Just predict the next race (skip retrain)
+python -m data.auto_update --predict-only
+```
+
+### Scheduled (launchd)
+
+To run automatically every Monday at 6 AM:
+
+```bash
+cp com.f1.auto-update.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.f1.auto-update.plist
+```
+
+The scheduler detects if a race happened since the last update. If the laptop was asleep during the scheduled time, it catches up on wake. State is tracked in `data/cache/.auto_update_state.json`.
 
 ## Web Dashboard
 
@@ -177,6 +207,7 @@ python -m data.dashboard
 │   │   └── explain.py           # SHAP / feature importance
 │   ├── pipeline.py              # End-to-end pipeline orchestrator
 │   ├── predict_weekend.py       # Predict next race weekend
+│   ├── auto_update.py           # Auto-detect results, retrain, predict
 │   ├── dashboard.py             # Rich terminal dashboard
 │   └── cache/                   # Cached data (gitignored)
 │       └── processed/           # Parquet files + prediction CSVs
@@ -187,6 +218,8 @@ python -m data.dashboard
 │   │   └── terminal.html        # Single-page Jinja2 template
 │   └── static/
 │       └── style.css            # Terminal-aesthetic CSS
+├── auto-update.command            # macOS launcher (auto-update pipeline)
+├── com.f1.auto-update.plist      # launchd schedule (Monday 6 AM)
 ├── dashboard.command             # macOS launcher (terminal dashboard)
 ├── web-dashboard.command         # macOS launcher (web dashboard)
 ├── requirements.txt
@@ -211,5 +244,8 @@ python -m data.dashboard
 - [x] Compromised finish detection (z-score based)
 - [x] Cumulative per-round championship standings
 - [x] Betting odds integration and value detection
+- [x] Auto-update pipeline (detect new results, retrain, predict next race)
+- [x] Incremental season ingest (merge with historical data)
+- [x] launchd scheduling (Monday 6 AM, catches up on wake)
 - [ ] Real-time race predictions during qualifying/race
 - [ ] Championship probability simulations (full season Monte Carlo)

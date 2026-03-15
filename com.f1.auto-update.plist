@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.f1.auto-update</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <string>cd /Users/julien.l/Documents/GitHub/formula-projections &amp;&amp; source venv/bin/activate &amp;&amp; python -m data.auto_update 2>&amp;1 >> data/cache/auto_update.log</string>
+    </array>
+
+    <!-- Run every Monday at 6:00 AM (most F1 races are Sunday) -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Weekday</key>
+        <integer>1</integer>
+        <key>Hour</key>
+        <integer>6</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <!-- Also run at login if a Monday run was missed (laptop was closed) -->
+    <key>StartInterval</key>
+    <integer>604800</integer>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/julien.l/Documents/GitHub/formula-projections</string>
+
+    <key>StandardOutPath</key>
+    <string>/Users/julien.l/Documents/GitHub/formula-projections/data/cache/auto_update_stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/julien.l/Documents/GitHub/formula-projections/data/cache/auto_update_stderr.log</string>
+
+    <!-- Run missed jobs when waking from sleep -->
+    <key>StartCalendarIntervalAllowedOverlap</key>
+    <false/>
+</dict>
+</plist>

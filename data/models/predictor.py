@@ -122,10 +122,16 @@ class F1Predictor:
         self.dnf_model = None
         self.feature_names: list[str] = []
         self.feature_importance: Optional[pd.DataFrame] = None
+        self._feature_medians: Optional[pd.Series] = None
 
     def train(self, X: pd.DataFrame, y_position: pd.Series, y_dnf: Optional[pd.Series] = None):
         """Train all prediction models with time-series cross-validation."""
         self.feature_names = list(X.columns)
+
+        # Fill NaN with column medians — ExtraTrees/CalibratedCV don't handle NaN
+        self._feature_medians = X.median()
+        if X.isna().any().any():
+            X = X.fillna(self._feature_medians)
 
         y_podium = (y_position <= 3).astype(int)
         y_winner = (y_position == 1).astype(int)
@@ -275,13 +281,21 @@ class F1Predictor:
         )
         return selected
 
+    def _fill_nan(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Fill NaN with training medians for models that don't handle missing values."""
+        if not X.isna().any().any():
+            return X
+        if self._feature_medians is not None:
+            return X.fillna(self._feature_medians)
+        return X.fillna(0)
+
     def predict_race(self, X: pd.DataFrame) -> pd.DataFrame:
         """Predict a full race grid with positions and probabilities."""
         if self.position_model is None:
             raise ValueError("Models not trained. Call train() first.")
 
         results = X.copy()
-        features = X[self.feature_names]
+        features = self._fill_nan(X[self.feature_names])
 
         results["predicted_position"] = self.position_model.predict(features)
         results["prob_podium"] = self.podium_model.predict_proba(features)[:, 1]
@@ -301,7 +315,7 @@ class F1Predictor:
         y_dnf: Optional[pd.Series] = None,
     ) -> dict:
         """Evaluate model on test data."""
-        features = X_test[self.feature_names]
+        features = self._fill_nan(X_test[self.feature_names])
         pred_pos = self.position_model.predict(features)
         pred_podium = self.podium_model.predict(features)
         pred_winner = self.winner_model.predict(features)

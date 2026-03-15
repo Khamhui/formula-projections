@@ -100,13 +100,15 @@ app.jinja_env.filters["na"] = _na
 
 def _filter_round(df: pd.DataFrame, season: int, race_round: int) -> pd.DataFrame:
     """Filter a results DataFrame to a specific season/round."""
-    if df.empty:
+    if df.empty or "season" not in df.columns or "round" not in df.columns:
         return pd.DataFrame()
     return df[(df["season"] == season) & (df["round"] == race_round)].sort_values("position")
 
 
 def _latest_standings(df: pd.DataFrame, season: int) -> pd.DataFrame:
     """Get latest standings for a season, sorted by points."""
+    if df.empty or "season" not in df.columns:
+        return pd.DataFrame()
     s = df[df["season"] == season]
     if s.empty:
         return pd.DataFrame()

@@ -110,7 +110,7 @@ def get_event_name(season: int, race_round: int) -> str:
             name = match.iloc[0]["race_name"]
             if pd.notna(name):
                 return name
-    except FileNotFoundError:
+    except (FileNotFoundError, ImportError, OSError):
         pass
 
     try:

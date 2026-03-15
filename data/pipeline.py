@@ -13,6 +13,7 @@ Usage:
 
 import argparse
 import logging
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -22,18 +23,27 @@ logger = logging.getLogger(__name__)
 DATA_DIR = Path(__file__).parent / "cache" / "processed"
 
 
-def step_ingest(start_year: int = 1950, end_year: int = 2025):
-    """Step 1: Download all historical data from Jolpica + FastF1."""
+def step_ingest(start_year: int = 1950, end_year: int = 2025, merge: bool = False):
+    """Step 1: Download historical data from Jolpica + FastF1.
+
+    Args:
+        merge: If True, merge new data into existing parquet files instead of
+               overwriting. Used by auto_update to re-ingest a single season
+               without losing historical data.
+    """
     from data.ingest.jolpica import JolpicaClient
 
     logger.info("=" * 60)
     logger.info("STEP 1: Data Ingestion")
     logger.info("=" * 60)
 
-    # Jolpica: 1950–present (historical backbone)
-    logger.info("Ingesting from Jolpica (1950–present)...")
+    # Jolpica: historical backbone
+    logger.info("Ingesting from Jolpica (%d–%d)...", start_year, end_year)
     client = JolpicaClient(cache=True)
     jolpica_data = client.ingest_all_seasons(start_year=start_year, end_year=end_year)
+
+    if merge:
+        jolpica_data = _merge_with_existing(jolpica_data, start_year, end_year)
 
     for name, df in jolpica_data.items():
         logger.info(f"  {name}: {len(df):,} rows")
@@ -52,6 +62,39 @@ def step_ingest(start_year: int = 1950, end_year: int = 2025):
         logger.warning(f"FastF1 ingestion failed: {e}. Continuing with Jolpica data.")
 
     logger.info("\nIngestion complete.")
+
+
+def _merge_with_existing(
+    new_data: dict[str, pd.DataFrame],
+    start_year: int,
+    end_year: int,
+) -> dict[str, pd.DataFrame]:
+    """Merge freshly ingested season data with existing parquet files.
+
+    Replaces rows for the ingested year range, keeps all other years intact.
+    """
+    merged = {}
+    for name, new_df in new_data.items():
+        existing_path = DATA_DIR / f"{name}.parquet"
+        if existing_path.exists() and "season" in new_df.columns:
+            existing = pd.read_parquet(existing_path)
+            # Remove old data for the re-ingested seasons
+            keep = existing[
+                ~existing["season"].between(start_year, end_year)
+            ]
+            combined = pd.concat([keep, new_df], ignore_index=True)
+            combined = combined.sort_values(
+                ["season", "round"] if "round" in combined.columns else ["season"],
+            )
+            combined.to_parquet(existing_path, index=False)
+            merged[name] = combined
+            logger.info(
+                "  Merged %s: kept %d historic + %d new = %d total",
+                name, len(keep), len(new_df), len(combined),
+            )
+        else:
+            merged[name] = new_df
+    return merged
 
 
 def step_features():
@@ -198,7 +241,7 @@ def main():
         help="Pipeline step to run",
     )
     parser.add_argument("--start-year", type=int, default=2003)
-    parser.add_argument("--end-year", type=int, default=2025)
+    parser.add_argument("--end-year", type=int, default=datetime.now().year)
     parser.add_argument("--test-seasons", type=int, nargs="+", default=None)
     parser.add_argument("--odds-season", type=int, default=None)
     parser.add_argument("--odds-round", type=int, default=None)
