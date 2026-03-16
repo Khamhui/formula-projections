@@ -25,7 +25,7 @@ from sklearn.ensemble import (
     StackingRegressor,
 )
 from sklearn.linear_model import Ridge
-from sklearn.model_selection import TimeSeriesSplit, cross_val_score
+from sklearn.model_selection import KFold, TimeSeriesSplit, cross_val_score
 from sklearn.metrics import mean_absolute_error, accuracy_score
 
 logger = logging.getLogger(__name__)
@@ -126,18 +126,43 @@ class F1Predictor:
 
     def train(self, X: pd.DataFrame, y_position: pd.Series, y_dnf: Optional[pd.Series] = None):
         """Train all prediction models with time-series cross-validation."""
+        if len(X) < 6:
+            raise ValueError(
+                f"Training requires at least 6 samples, got {len(X)}. "
+                "Check that the feature matrix has enough historical data."
+            )
+
         self.feature_names = list(X.columns)
 
         # Fill NaN with column medians — ExtraTrees/CalibratedCV don't handle NaN
         self._feature_medians = X.median()
         if X.isna().any().any():
             X = X.fillna(self._feature_medians)
+        # Columns still NaN (all-NaN columns where median is NaN) → fill with 0
+        if X.isna().any().any():
+            X = X.fillna(0)
+            self._feature_medians = self._feature_medians.fillna(0)
 
         y_podium = (y_position <= 3).astype(int)
         y_winner = (y_position == 1).astype(int)
         y_points = (y_position <= 10).astype(int)
 
-        tscv = TimeSeriesSplit(n_splits=5)
+        n_splits = max(2, min(5, len(X) - 1))
+        tscv = TimeSeriesSplit(n_splits=n_splits)
+        # StackingRegressor needs partition-based CV (KFold), not TimeSeriesSplit
+        stacking_cv = KFold(n_splits=n_splits, shuffle=False)
+
+        def _calibrate(base, y_binary):
+            """Wrap classifier in CalibratedClassifierCV if enough samples per class."""
+            min_class = min(y_binary.sum(), len(y_binary) - y_binary.sum())
+            if min_class < 3:
+                logger.warning(
+                    "Too few samples for calibration (min class=%d), using uncalibrated model", min_class
+                )
+                return base
+            splits = max(2, min(3, int(min_class)))
+            cv = TimeSeriesSplit(n_splits=splits)
+            return CalibratedClassifierCV(base, cv=cv, method="isotonic")
 
         # Load Optuna-tuned params if available
         tuned = None
@@ -180,7 +205,7 @@ class F1Predictor:
         self.position_model = StackingRegressor(
             estimators=[("gb", base_gb), ("extra", base_extra)],
             final_estimator=Ridge(alpha=10.0),
-            cv=5,
+            cv=stacking_cv,
             passthrough=False,
             n_jobs=-1,
         )
@@ -204,9 +229,7 @@ class F1Predictor:
         _podium_base = create_model("classifier", **pod_params)
         cv_scores = cross_val_score(_podium_base, X, y_podium, cv=tscv, scoring="accuracy")
         logger.info(f"Podium accuracy (CV): {cv_scores.mean():.3f} +/- {cv_scores.std():.3f}")
-        self.podium_model = CalibratedClassifierCV(
-            _podium_base, cv=TimeSeriesSplit(n_splits=3), method="isotonic",
-        )
+        self.podium_model = _calibrate(_podium_base, y_podium)
         self.podium_model.fit(X, y_podium)
 
         # 3. Winner Classification (calibrated)
@@ -216,9 +239,7 @@ class F1Predictor:
         win_params = _get_params("winner", win_defaults)
         win_params["scale_pos_weight"] = len(y_winner) / max(y_winner.sum(), 1) - 1
         _winner_base = create_model("classifier", **win_params)
-        self.winner_model = CalibratedClassifierCV(
-            _winner_base, cv=TimeSeriesSplit(n_splits=3), method="isotonic",
-        )
+        self.winner_model = _calibrate(_winner_base, y_winner)
         self.winner_model.fit(X, y_winner)
 
         # 4. Points Classification (calibrated)
@@ -227,9 +248,7 @@ class F1Predictor:
                            min_child_weight=5, reg_alpha=0.1, reg_lambda=1.0)
         pts_params = _get_params("points", pts_defaults)
         _points_base = create_model("classifier", **pts_params)
-        self.points_model = CalibratedClassifierCV(
-            _points_base, cv=TimeSeriesSplit(n_splits=3), method="isotonic",
-        )
+        self.points_model = _calibrate(_points_base, y_points)
         self.points_model.fit(X, y_points)
 
         # 5. DNF Classification (calibrated)
@@ -245,9 +264,7 @@ class F1Predictor:
         )
         cv_dnf = cross_val_score(_dnf_base, X, y_dnf, cv=tscv, scoring="accuracy")
         logger.info(f"DNF accuracy (CV): {cv_dnf.mean():.3f} +/- {cv_dnf.std():.3f}")
-        self.dnf_model = CalibratedClassifierCV(
-            _dnf_base, cv=TimeSeriesSplit(n_splits=3), method="isotonic",
-        )
+        self.dnf_model = _calibrate(_dnf_base, y_dnf)
         self.dnf_model.fit(X, y_dnf)
 
         # Feature importance — stacking model needs permutation importance
@@ -289,13 +306,22 @@ class F1Predictor:
             return X.fillna(self._feature_medians)
         return X.fillna(0)
 
+    def _align_features(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Align columns to training features, adding missing ones as NaN."""
+        missing = set(self.feature_names) - set(X.columns)
+        if missing:
+            X = X.copy()
+            for col in missing:
+                X[col] = np.nan
+        return self._fill_nan(X[self.feature_names])
+
     def predict_race(self, X: pd.DataFrame) -> pd.DataFrame:
         """Predict a full race grid with positions and probabilities."""
         if self.position_model is None:
             raise ValueError("Models not trained. Call train() first.")
 
         results = X.copy()
-        features = self._fill_nan(X[self.feature_names])
+        features = self._align_features(X)
 
         results["predicted_position"] = self.position_model.predict(features)
         results["prob_podium"] = self.podium_model.predict_proba(features)[:, 1]
@@ -315,7 +341,7 @@ class F1Predictor:
         y_dnf: Optional[pd.Series] = None,
     ) -> dict:
         """Evaluate model on test data."""
-        features = self._fill_nan(X_test[self.feature_names])
+        features = self._align_features(X_test)
         pred_pos = self.position_model.predict(features)
         pred_podium = self.podium_model.predict(features)
         pred_winner = self.winner_model.predict(features)
@@ -356,6 +382,8 @@ class F1Predictor:
         if self.dnf_model is not None:
             joblib.dump(self.dnf_model, path / "dnf_model.joblib")
         joblib.dump(self.feature_names, path / "feature_names.joblib")
+        if self._feature_medians is not None:
+            joblib.dump(self._feature_medians, path / "feature_medians.joblib")
 
         if self.feature_importance is not None:
             self.feature_importance.to_csv(path / "feature_importance.csv", index=False)
@@ -376,6 +404,10 @@ class F1Predictor:
         if dnf_path.exists():
             self.dnf_model = joblib.load(dnf_path)
 
+        medians_path = path / "feature_medians.joblib"
+        if medians_path.exists():
+            self._feature_medians = joblib.load(medians_path)
+
         importance_path = path / "feature_importance.csv"
         if importance_path.exists():
             self.feature_importance = pd.read_csv(importance_path)
@@ -392,7 +424,13 @@ def train_and_evaluate(
 
     if test_seasons is None:
         max_season = int(feature_matrix["season"].max())
-        test_seasons = [max_season - 1, max_season]
+        all_seasons = sorted(feature_matrix["season"].unique())
+        if len(all_seasons) >= 3:
+            test_seasons = [max_season - 1, max_season]
+        elif len(all_seasons) == 2:
+            test_seasons = [max_season]
+        else:
+            test_seasons = []
 
     train_mask = ~feature_matrix["season"].isin(test_seasons)
     test_mask = feature_matrix["season"].isin(test_seasons)
@@ -419,6 +457,11 @@ def train_and_evaluate(
 
     model = F1Predictor()
     model.train(X_train, y_train, y_dnf=train_dnf)
-    metrics = model.evaluate(X_test, y_test, y_dnf=test_dnf)
+
+    if X_test.empty:
+        logger.warning("No test data available — skipping evaluation")
+        metrics = {"position_mae": None, "podium_accuracy": None, "winner_accuracy": None}
+    else:
+        metrics = model.evaluate(X_test, y_test, y_dnf=test_dnf)
 
     return model, metrics

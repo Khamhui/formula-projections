@@ -30,6 +30,18 @@
 </div>
 {% endmacro %}
 
+{# ===== Sparkline macro — invert=true for "lower is better" (positions) ===== #}
+{% macro sparkline(points, color='var(--accent)', invert=false) %}
+<svg class="sparkline" viewBox="0 0 60 16" preserveAspectRatio="none">
+  {% set mn = points|min %}
+  {% set mx = points|max %}
+  {% set rng = mx - mn if mx != mn else 1 %}
+  <polyline fill="none" stroke="{{ color }}" stroke-width="1.5"
+    points="{% for v in points %}{{ (loop.index0 / (points|length - 1) * 58 + 1)|round(1) }},{% if invert %}{{ ((v - mn) / rng * 14)|round(1) }}{% else %}{{ (15 - (v - mn) / rng * 14)|round(1) }}{% endif %}{% if not loop.last %} {% endif %}{% endfor %}"
+  />
+</svg>
+{% endmacro %}
+
 <!-- ===== Top bar ===== -->
 <div class="topbar">
   <span class="topbar-title">F1 PREDICTION ENGINE</span>
@@ -38,25 +50,33 @@
     {% if circuit_type %}
     <span class="circuit-badge {{ circuit_type }}">{{ circuit_type|replace('_', '-') }}</span>
     {% endif %}
-    {% if available|length > 1 %}
+    {% if all_rounds|length > 1 %}
     &middot;
     <select onchange="var v=this.value.split(',');window.location='/?season='+v[0]+'&round='+v[1]" style="margin-left:4px">
-      {% for s, r, name in available %}
-      <option value="{{ s }},{{ r }}" {{ 'selected' if s == season and r == race_round }}>{{ s }} R{{ r }}</option>
+      {% for (s, r), name in all_rounds %}
+      {% set has_pred = (s, r) in pred_set %}
+      <option value="{{ s }},{{ r }}" {{ 'selected' if s == season and r == race_round }}>{{ s }} R{{ r }} — {{ name }}{% if has_pred %} ★{% endif %}</option>
       {% endfor %}
     </select>
     {% endif %}
   </span>
   <div class="topbar-right">
+    {% if pred_generated %}
+    <span class="topbar-meta" title="Prediction generated at">pred: {{ pred_generated }}</span>
+    <span class="topbar-meta dim">&middot;</span>
+    {% endif %}
+    <button class="theme-btn" onclick="runPredict('predict')" id="btn-predict" title="Run prediction for this round">▶ Predict</button>
+    <button class="theme-btn" onclick="runPredict('full')" id="btn-full" title="Full pipeline: ingest + retrain + predict">▶ Full Update</button>
+    <span id="predict-status"></span>
     <span class="topbar-meta">{{ now }}</span>
     <button class="theme-btn" onclick="toggleTheme()">◐</button>
   </div>
 </div>
 
-<!-- ===== 4-column grid ===== -->
+<!-- ===== 6-column grid ===== -->
 <div class="grid">
 
-  <!-- ===== COL 1: Predictions + Charts ===== -->
+  <!-- ═══════ COL 1: PREDICTION ═══════ -->
   <div class="panel">
     {% if pred is not none %}
     <div class="section">
@@ -105,7 +125,7 @@
             <td class="c {{ pos|pos_class }}">{{ pos }}</td>
             <td><span class="tc" style="background:{{ team_color(cid) }}"></span><span class="{{ 'bright' if pos <= 3 }}">{{ driver_name(row.driver_id) }}</span></td>
             <td class="dim">{{ team_name(cid) if cid else '' }}</td>
-            <td class="c">{% set g = row.get('grid', '') %}{{ g|int if g == g else '-' }}</td>
+            <td class="c">{% set g = row.get('grid', '') %}{{ g|int if g|notnan else '-' }}</td>
             <td class="r">{{ "%.1f"|format(row.predicted_position) }}</td>
             <td class="r">
               <span class="bar" style="width:{{ row.sim_win_pct * 0.8 }}px"></span>
@@ -142,12 +162,12 @@
       </ul>
     </div>
 
-    {# Charts — below prediction grid #}
+    {# Charts #}
     {{ bar_chart("Win Probability", pred, "sim_win_pct", "accent-bar", threshold=0.5) }}
     {{ bar_chart("Expected Points", pred, "sim_expected_points", "yellow-bar", suffix="", n=10) }}
     {{ bar_chart("Podium Probability", pred, "sim_podium_pct", "cyan-bar", threshold=5) }}
 
-    {# DNF Risk — uses pre-sorted data from Python #}
+    {# DNF Risk #}
     {% if dnf_sorted is not none %}
     <div class="section">
       <div class="section-title">DNF Risk</div>
@@ -176,9 +196,328 @@
     {% endif %}
   </div>
 
-  <!-- ===== COL 2: Race Results + Sprint + Qualifying ===== -->
+  <!-- ═══════ COL 2: RACE CONTEXT ═══════ -->
   <div class="panel">
-    {# Race results first (most important when available) #}
+
+    {# Circuit Profile #}
+    {% set cs = race_context.circuit_stats %}
+    <div class="section">
+      <div class="section-title">Circuit Profile <span class="tag">{{ circuit_type|replace('_', ' ') }}</span></div>
+      {% if cs %}
+      <div class="kv-grid">
+        {% if 'grid_importance' in cs %}
+        <div class="kv"><span class="kv-label">Grid Importance</span><span class="kv-val {{ 'gain' if cs.grid_importance > 0.5 else 'dim' }}">{{ "%.2f"|format(cs.grid_importance) }}</span></div>
+        {% endif %}
+        {% if 'grid_correlation' in cs %}
+        <div class="kv"><span class="kv-label">Grid→Finish Corr.</span><span class="kv-val">{{ "%.2f"|format(cs.grid_correlation) }}</span></div>
+        {% endif %}
+        {% if 'overtaking_rate' in cs %}
+        <div class="kv"><span class="kv-label">Overtaking Rate</span><span class="kv-val {{ 'gain' if cs.overtaking_rate > 0.3 else 'dim' }}">{{ "%.0f"|format(cs.overtaking_rate * 100) }}%</span></div>
+        {% endif %}
+        {% if 'attrition_rate' in cs %}
+        <div class="kv"><span class="kv-label">Attrition Rate</span><span class="kv-val {{ 'dnf-warn' if cs.attrition_rate > 0.15 else 'dim' }}">{{ "%.0f"|format(cs.attrition_rate * 100) }}%</span></div>
+        {% endif %}
+        {% if 'front_row_win_rate' in cs %}
+        <div class="kv"><span class="kv-label">Front Row Win%</span><span class="kv-val">{{ "%.0f"|format(cs.front_row_win_rate * 100) }}%</span></div>
+        {% endif %}
+      </div>
+      {% else %}
+      <p class="dim">No circuit data available</p>
+      {% endif %}
+    </div>
+
+    {# Circuit Performance — drivers' history at this track #}
+    {% set cd = race_context.circuit_drivers %}
+    {% if cd is not none and cd|length > 0 %}
+    <div class="section">
+      <div class="section-title">Track Specialists</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Driver</th>
+            <th class="r">Avg</th>
+            <th class="r">Best</th>
+            <th class="r">Races</th>
+            <th class="r">Pod%</th>
+            {% if 'circuit_quali_avg' in cd.columns %}
+            <th class="r">Q.Avg</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for i, row in cd.iterrows() %}
+          {% set cid = row.get('constructor_id', '') %}
+          <tr>
+            <td><span class="tc" style="background:{{ team_color(cid) }}"></span>{{ driver_name(row.driver_id) }}</td>
+            <td class="r {{ 'bright' if row.circuit_avg_pos <= 5 else 'dim' }}">{{ "%.1f"|format(row.circuit_avg_pos) }}</td>
+            <td class="r {{ row.circuit_best_pos|pos_class }}">{{ row.circuit_best_pos|int }}</td>
+            <td class="r dim">{{ row.circuit_races|int }}</td>
+            <td class="r {{ 'gain' if row.circuit_podium_rate > 0.3 else 'dim' }}">{{ "%.0f"|format(row.circuit_podium_rate * 100) }}%</td>
+            {% if 'circuit_quali_avg' in cd.columns %}
+            <td class="r dim">{{ "%.1f"|format(row.circuit_quali_avg) if row.circuit_quali_avg|notnan else '-' }}</td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    {# Qualifying Pace Delta #}
+    {% if driver_form is not none and driver_form|length > 0 and 'quali_delta_vs_field' in driver_form.columns %}
+    <div class="section">
+      <div class="section-title">Qualifying Pace <span class="tag">vs field median</span></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Driver</th>
+            <th class="r">Delta</th>
+            {% if 'quali_improvement_pct' in driver_form.columns %}
+            <th class="r">Trend</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for i, row in (form_by_quali if form_by_quali is defined else driver_form).iterrows() %}
+          {% set cid = row.get('constructor_id', '') %}
+          {% set d = row.quali_delta_vs_field %}
+          {% if d|notnan %}
+          <tr>
+            <td><span class="tc" style="background:{{ team_color(cid) }}"></span>{{ driver_name(row.driver_id) }}</td>
+            <td class="r {{ 'gain' if d < 0 else 'drop' }}">{{ "%+.3f"|format(d) }}s</td>
+            {% if 'quali_improvement_pct' in driver_form.columns %}
+            {% set imp = row.quali_improvement_pct %}
+            <td class="r {{ 'gain' if imp > 0 else ('drop' if imp < 0 else 'dim') }}">{% if imp|notnan %}{{ "%+.1f"|format(imp) }}%{% else %}-{% endif %}</td>
+            {% endif %}
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    {# FP2 Race Pace #}
+    {% if driver_form is not none and driver_form|length > 0 and 'fp_delta_vs_field' in driver_form.columns %}
+    {% set fp_data = driver_form[driver_form['fp_delta_vs_field'].notna()] %}
+    {% if fp_data|length > 0 %}
+    <div class="section">
+      <div class="section-title">Practice Pace <span class="tag">FP2 long runs</span></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Driver</th>
+            <th class="r">Delta</th>
+            {% if 'fp_total_laps' in driver_form.columns %}
+            <th class="r">Laps</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for i, row in fp_data.sort_values('fp_delta_vs_field').iterrows() %}
+          {% set cid = row.get('constructor_id', '') %}
+          {% set d = row.fp_delta_vs_field %}
+          <tr>
+            <td><span class="tc" style="background:{{ team_color(cid) }}"></span>{{ driver_name(row.driver_id) }}</td>
+            <td class="r {{ 'gain' if d < 0 else 'drop' }}">{{ "%+.3f"|format(d) }}s</td>
+            {% if 'fp_total_laps' in driver_form.columns %}
+            <td class="r dim">{{ row.fp_total_laps|int if row.fp_total_laps|notnan else '-' }}</td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+    {% endif %}
+  </div>
+
+  <!-- ═══════ COL 3: DRIVER FORM ═══════ -->
+  <div class="panel">
+
+    {# Momentum Rankings #}
+    {% if driver_form is not none and driver_form|length > 0 and 'momentum_score' in driver_form.columns %}
+    <div class="section">
+      <div class="section-title">Momentum <span class="tag">weighted recent form</span></div>
+      <div class="chart">
+        {% set mdata = driver_form.head(10) %}
+        {% set max_mom = mdata.iloc[0].momentum_score if mdata|length > 0 and mdata.iloc[0].momentum_score > 0 else 1 %}
+        {% for i, row in mdata.iterrows() %}
+        {% set cid = row.get('constructor_id', '') %}
+        {% set m = row.momentum_score %}
+        {% if m|notnan %}
+        <div class="chart-row">
+          <span class="chart-label">{{ driver_name(row.driver_id) }}</span>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar {{ 'accent-bar' if m > 0 else 'red-bar' }}" style="width:{{ ((m / max_mom * 100) if max_mom > 0 else 0)|round(1)|abs }}%"></div>
+          </div>
+          <span class="chart-val {{ 'gain' if m > 0 else 'drop' }}">{{ "%+.1f"|format(m) }}</span>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# Recent Form + Position Sparklines #}
+    {% if driver_form is not none and driver_form|length > 0 %}
+    <div class="section">
+      <div class="section-title">Recent Form <span class="tag">position averages</span></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Driver</th>
+            {% if 'pos_last3_mean' in driver_form.columns %}<th class="r">L3</th>{% endif %}
+            {% if 'pos_last5_mean' in driver_form.columns %}<th class="r">L5</th>{% endif %}
+            {% if 'pos_last10_mean' in driver_form.columns %}<th class="r">L10</th>{% endif %}
+            {% if 'form_vs_season_avg' in driver_form.columns %}<th class="r">vs Avg</th>{% endif %}
+            <th>Trend</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i, row in (form_by_pos if form_by_pos is defined else driver_form).iterrows() %}
+          {% set cid = row.get('constructor_id', '') %}
+          <tr>
+            <td><span class="tc" style="background:{{ team_color(cid) }}"></span>{{ driver_name(row.driver_id) }}</td>
+            {% if 'pos_last3_mean' in driver_form.columns %}
+            <td class="r {{ 'bright' if row.pos_last3_mean <= 5 else 'dim' }}">{{ "%.1f"|format(row.pos_last3_mean) if row.pos_last3_mean|notnan else '-' }}</td>
+            {% endif %}
+            {% if 'pos_last5_mean' in driver_form.columns %}
+            <td class="r">{{ "%.1f"|format(row.pos_last5_mean) if row.pos_last5_mean|notnan else '-' }}</td>
+            {% endif %}
+            {% if 'pos_last10_mean' in driver_form.columns %}
+            <td class="r dim">{{ "%.1f"|format(row.pos_last10_mean) if row.pos_last10_mean|notnan else '-' }}</td>
+            {% endif %}
+            {% if 'form_vs_season_avg' in driver_form.columns %}
+            {% set fvsa = row.form_vs_season_avg %}
+            <td class="r {{ 'gain' if fvsa < 0 else ('drop' if fvsa > 0 else 'dim') }}">{% if fvsa|notnan %}{{ "%+.1f"|format(fvsa) }}{% else %}-{% endif %}</td>
+            {% endif %}
+            <td>
+              {% if row.driver_id in position_history %}
+              {{ sparkline(position_history[row.driver_id], 'var(--cyan)', invert=true) }}
+              {% else %}<span class="dim">-</span>{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    {# Teammate Head-to-Head #}
+    {% if driver_form is not none and driver_form|length > 0 and 'h2h_quali_rate' in driver_form.columns %}
+    <div class="section">
+      <div class="section-title">Teammate H2H <span class="tag">qualifying</span></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Driver</th>
+            <th class="r">Q Rate</th>
+            {% if 'teammate_elo_diff' in driver_form.columns %}
+            <th class="r">ELO Δ</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for i, row in (form_by_h2h if form_by_h2h is defined else driver_form).iterrows() %}
+          {% set cid = row.get('constructor_id', '') %}
+          {% set h2h = row.h2h_quali_rate %}
+          {% if h2h|notnan %}
+          <tr>
+            <td><span class="tc" style="background:{{ team_color(cid) }}"></span>{{ driver_name(row.driver_id) }}</td>
+            <td class="r {{ 'gain' if h2h > 0.55 else ('drop' if h2h < 0.45 else 'dim') }}">{{ "%.0f"|format(h2h * 100) }}%</td>
+            {% if 'teammate_elo_diff' in driver_form.columns %}
+            {% set ed = row.teammate_elo_diff %}
+            <td class="r {{ 'gain' if ed > 20 else ('drop' if ed < -20 else 'dim') }}">{% if ed|notnan %}{{ "%+.0f"|format(ed) }}{% else %}-{% endif %}</td>
+            {% endif %}
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    {# DNF Risk Breakdown #}
+    {% if driver_form is not none and driver_form|length > 0 and 'dnf_rate_last5' in driver_form.columns %}
+    <div class="section">
+      <div class="section-title">Reliability <span class="tag">DNF rates</span></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Driver</th>
+            <th class="r">L5</th>
+            {% if 'dnf_rate_last10' in driver_form.columns %}<th class="r">L10</th>{% endif %}
+            {% if 'dnf_streak' in driver_form.columns %}<th class="r">Streak</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for i, row in (form_by_dnf if form_by_dnf is defined else driver_form).iterrows() %}
+          {% set cid = row.get('constructor_id', '') %}
+          {% set d5 = row.dnf_rate_last5 %}
+          {% if d5|notnan and d5 > 0 %}
+          <tr>
+            <td><span class="tc" style="background:{{ team_color(cid) }}"></span>{{ driver_name(row.driver_id) }}</td>
+            <td class="r {{ 'dnf-high' if d5 >= 0.3 else ('dnf-warn' if d5 >= 0.2 else 'dim') }}">{{ "%.0f"|format(d5 * 100) }}%</td>
+            {% if 'dnf_rate_last10' in driver_form.columns %}
+            <td class="r dim">{{ "%.0f"|format(row.dnf_rate_last10 * 100) if row.dnf_rate_last10|notnan else '-' }}%</td>
+            {% endif %}
+            {% if 'dnf_streak' in driver_form.columns %}
+            <td class="r {{ 'dnf-high' if row.dnf_streak >= 2 else 'dim' }}">{{ row.dnf_streak|int if row.dnf_streak|notnan else '0' }}</td>
+            {% endif %}
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ═══════ COL 4: RESULTS ═══════ -->
+  <div class="panel">
+
+    {# Prediction Accuracy (when race completed) #}
+    {% if pred_accuracy is not none and pred_accuracy|length > 0 %}
+    <div class="section">
+      <div class="section-title">Prediction Accuracy <span class="tag">model vs actual</span></div>
+      {% set mae = (pred_accuracy['delta'].abs().mean()) %}
+      {% set within3 = ((pred_accuracy['delta'].abs() <= 3).mean() * 100) %}
+      <div class="stats">
+        <div class="stat">
+          <span class="label">MAE</span>
+          <span class="value {{ 'gain' if mae < 3 else ('dnf-warn' if mae < 5 else 'drop') }}">{{ "%.1f"|format(mae) }}</span>
+        </div>
+        <div class="stat">
+          <span class="label">Within 3</span>
+          <span class="value {{ 'gain' if within3 > 60 else 'dim' }}">{{ "%.0f"|format(within3) }}%</span>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="c" style="width:24px">P</th>
+            <th>Driver</th>
+            <th class="r">Pred</th>
+            <th class="r">Δ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i, row in pred_accuracy.iterrows() %}
+          {% set d = row.delta %}
+          <tr>
+            <td class="c {{ row.actual|pos_class }}">{{ row.actual|int }}</td>
+            <td>{{ driver_name(row.driver_id) }}</td>
+            <td class="r">{{ "%.1f"|format(row.predicted_position) }}</td>
+            <td class="r {{ 'gain' if d|abs <= 2 else ('dnf-warn' if d|abs <= 4 else 'drop') }}">{{ "%+.1f"|format(d) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    {# Race Result #}
     <div class="section">
       <div class="section-title">Race Result <span class="tag">{{ event_name }}</span></div>
       {% if race|length > 0 %}
@@ -197,15 +536,15 @@
         <tbody>
           {% for i, row in race.iterrows() %}
           {% set p = row.position %}
-          {% set g = row.grid if row.grid == row.grid else 0 %}
-          {% set delta = (g|int - p|int) if p == p and g == g else 0 %}
+          {% set g = row.grid if row.grid|notnan else 0 %}
+          {% set delta = (g|int - p|int) if p|notnan and g|notnan else 0 %}
           <tr>
-            <td class="c {{ p|pos_class }}">{{ p|int if p == p else '-' }}</td>
-            <td><span class="tc" style="background:{{ team_color(row.constructor_id) }}"></span><span class="{{ 'bright' if p == p and p <= 3 }}">{{ driver_name(row.driver_id) }}</span></td>
+            <td class="c {{ p|pos_class }}">{{ p|int if p|notnan else '-' }}</td>
+            <td><span class="tc" style="background:{{ team_color(row.constructor_id) }}"></span><span class="{{ 'bright' if p|notnan and p <= 3 }}">{{ driver_name(row.driver_id) }}</span></td>
             <td class="dim">{{ team_name(row.constructor_id) }}</td>
             <td class="c dim">{{ g|int if g else '-' }}</td>
             <td class="c {{ delta|delta_class }}">{% if delta > 0 %}+{{ delta }}{% elif delta < 0 %}{{ delta }}{% else %}-{% endif %}</td>
-            <td class="r">{{ row.points|int if row.points == row.points else 0 }}</td>
+            <td class="r">{{ row.points|int if row.points|notnan else 0 }}</td>
             <td class="{{ 'dnf-high' if row.status != 'Finished' and '+' not in (row.status or '') else 'dim' }}">{{ row.status|na }}</td>
           </tr>
           {% endfor %}
@@ -234,10 +573,10 @@
           {% for i, row in sprint.iterrows() %}
           {% set p = row.position %}
           <tr>
-            <td class="c {{ p|pos_class }}">{{ p|int if p == p else '-' }}</td>
+            <td class="c {{ p|pos_class }}">{{ p|int if p|notnan else '-' }}</td>
             <td><span class="tc" style="background:{{ team_color(row.constructor_id) }}"></span>{{ driver_name(row.driver_id) }}</td>
-            <td class="c dim">{{ row.grid|int if row.grid == row.grid else '-' }}</td>
-            <td class="r">{{ row.points|int if row.points == row.points else 0 }}</td>
+            <td class="c dim">{{ row.grid|int if row.grid|notnan else '-' }}</td>
+            <td class="r">{{ row.points|int if row.points|notnan else 0 }}</td>
             <td class="dim">{{ row.status|na }}</td>
           </tr>
           {% endfor %}
@@ -264,7 +603,7 @@
           {% for i, row in quali.iterrows() %}
           {% set p = row.position %}
           <tr>
-            <td class="c {{ p|pos_class }}">{{ p|int if p == p else '-' }}</td>
+            <td class="c {{ p|pos_class }}">{{ p|int if p|notnan else '-' }}</td>
             <td><span class="tc" style="background:{{ team_color(row.constructor_id) }}"></span>{{ driver_name(row.driver_id) }}</td>
             <td class="r dim">{{ row.q1|na }}</td>
             <td class="r dim">{{ row.q2|na }}</td>
@@ -279,8 +618,9 @@
     </div>
   </div>
 
-  <!-- ===== COL 3: Standings + ELO ===== -->
+  <!-- ═══════ COL 5: CHAMPIONSHIP ═══════ -->
   <div class="panel">
+
     {# Driver standings #}
     <div class="section">
       <div class="section-title">Drivers Championship <span class="tag">{{ season }}</span></div>
@@ -311,7 +651,7 @@
       {% endif %}
     </div>
 
-    {# Constructor standings with ELO (dict lookup — O(1) per row) #}
+    {# Constructor standings with ELO #}
     <div class="section">
       <div class="section-title">Constructors</div>
       {% if constructors|length > 0 %}
@@ -344,6 +684,41 @@
       {% endif %}
     </div>
 
+    {# Constructor Development Trend #}
+    {% if constructor_trends is not none and constructor_trends|length > 0 %}
+    <div class="section">
+      <div class="section-title">Constructor Trends <span class="tag">development</span></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Team</th>
+            {% if 'constructor_pace_jump' in constructor_trends.columns %}<th class="r">Pace Δ</th>{% endif %}
+            {% if 'constructor_season_trend' in constructor_trends.columns %}<th class="r">Trend</th>{% endif %}
+            {% if 'constructor_season_avg' in constructor_trends.columns %}<th class="r">Avg</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for i, row in constructor_trends.iterrows() %}
+          <tr>
+            <td><span class="tc" style="background:{{ team_color(row.constructor_id) }}"></span>{{ team_name(row.constructor_id) }}</td>
+            {% if 'constructor_pace_jump' in constructor_trends.columns %}
+            {% set pj = row.constructor_pace_jump %}
+            <td class="r {{ 'gain' if pj > 0.5 else ('drop' if pj < -0.5 else 'dim') }}">{% if pj|notnan %}{{ "%+.1f"|format(pj) }}{% else %}-{% endif %}</td>
+            {% endif %}
+            {% if 'constructor_season_trend' in constructor_trends.columns %}
+            {% set st = row.constructor_season_trend %}
+            <td class="r {{ 'gain' if st < 0 else ('drop' if st > 0 else 'dim') }}">{% if st|notnan %}{{ "%+.1f"|format(st) }}{% else %}-{% endif %}</td>
+            {% endif %}
+            {% if 'constructor_season_avg' in constructor_trends.columns %}
+            <td class="r dim">{{ "%.1f"|format(row.constructor_season_avg) if row.constructor_season_avg|notnan else '-' }}</td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
     {# Driver ELO Rankings #}
     {% if driver_elo is not none and driver_elo|length > 0 %}
     <div class="section">
@@ -367,19 +742,11 @@
             <td class="c {{ row.elo_rank|pos_class }}">{{ row.elo_rank }}</td>
             <td><span class="tc" style="background:{{ team_color(cid) }}"></span><span class="{{ 'bright' if row.elo_rank <= 3 }}">{{ driver_name(did) }}</span></td>
             <td class="r bright">{{ row.elo_overall|int }}</td>
-            <td class="r dim">{{ row.elo_qualifying|int if row.elo_qualifying == row.elo_qualifying else '-' }}</td>
-            <td class="r dim">{{ row.elo_circuit_type|int if row.elo_circuit_type == row.elo_circuit_type else '-' }}</td>
+            <td class="r dim">{{ row.elo_qualifying|int if row.elo_qualifying|notnan else '-' }}</td>
+            <td class="r dim">{{ row.elo_circuit_type|int if row.elo_circuit_type|notnan else '-' }}</td>
             <td>
               {% if did in elo_history %}
-              <svg class="sparkline" viewBox="0 0 60 16" preserveAspectRatio="none">
-                {% set points = elo_history[did] %}
-                {% set mn = points|min %}
-                {% set mx = points|max %}
-                {% set rng = mx - mn if mx != mn else 1 %}
-                <polyline fill="none" stroke="var(--accent)" stroke-width="1.5"
-                  points="{% for v in points %}{{ (loop.index0 / (points|length - 1) * 58 + 1)|round(1) }},{{ (15 - (v - mn) / rng * 14)|round(1) }}{% if not loop.last %} {% endif %}{% endfor %}"
-                />
-              </svg>
+              {{ sparkline(elo_history[did], 'var(--accent)') }}
               {% else %}<span class="dim">-</span>{% endif %}
             </td>
           </tr>
@@ -390,7 +757,7 @@
     {% endif %}
   </div>
 
-  <!-- ===== COL 4: News Feed ===== -->
+  <!-- ═══════ COL 6: NEWS FEED ═══════ -->
   <div class="panel">
     <div class="section">
       <div class="section-title">News Feed <span class="tag">RSS</span></div>
@@ -433,6 +800,61 @@
     .catch(() => {
       document.getElementById('news-feed').innerHTML = '<p class="dim">RSS unavailable</p>';
     });
+
+  // Prediction runner
+  function runPredict(mode) {
+    const status = document.getElementById('predict-status');
+    const btnPredict = document.getElementById('btn-predict');
+    const btnFull = document.getElementById('btn-full');
+
+    btnPredict.disabled = true;
+    btnFull.disabled = true;
+    status.className = 'topbar-meta';
+    status.textContent = mode === 'full' ? 'updating...' : 'predicting...';
+
+    fetch('/api/predict', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({season: {{ season }}, round: {{ race_round }}, mode: mode})
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'already_running') {
+        status.textContent = 'already running';
+        return;
+      }
+      pollStatus();
+    })
+    .catch(() => {
+      status.className = 'topbar-meta drop';
+      status.textContent = 'failed to start';
+      btnPredict.disabled = false;
+      btnFull.disabled = false;
+    });
+  }
+
+  function pollStatus() {
+    const status = document.getElementById('predict-status');
+    const interval = setInterval(() => {
+      fetch('/api/predict/status')
+        .then(r => r.json())
+        .then(data => {
+          if (data.running) return;
+          clearInterval(interval);
+          if (data.error) {
+            status.className = 'topbar-meta drop';
+            status.textContent = 'error: ' + data.error.slice(0, 80);
+            status.title = data.error;
+            document.getElementById('btn-predict').disabled = false;
+            document.getElementById('btn-full').disabled = false;
+          } else {
+            status.className = 'topbar-meta gain';
+            status.textContent = 'done — reloading...';
+            setTimeout(() => window.location.reload(), 1000);
+          }
+        });
+    }, 3000);
+  }
 </script>
 </body>
 </html>

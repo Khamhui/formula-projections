@@ -91,13 +91,60 @@ def load_prediction(season: int, race_round: int) -> pd.DataFrame | None:
         return None
 
 
-def available_predictions() -> list[tuple[int, int, str]]:
-    files = sorted(DATA_DIR.glob("prediction_*_R*.csv"), reverse=True)
-    results = []
+def prediction_mtime(season: int, race_round: int) -> str | None:
+    """Return human-readable mtime of the prediction CSV, or None."""
+    from datetime import datetime
+    path = DATA_DIR / f"prediction_{season}_R{race_round:02d}.csv"
+    try:
+        ts = path.stat().st_mtime
+        return datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M")
+    except FileNotFoundError:
+        return None
+
+
+def available_predictions() -> set[tuple[int, int]]:
+    """Return set of (season, round) tuples that have prediction CSVs."""
+    files = DATA_DIR.glob("prediction_*_R*.csv")
+    results = set()
     for f in files:
         parts = f.stem.split("_")
-        results.append((int(parts[1]), int(parts[2][1:]), f.stem))
+        results.add((int(parts[1]), int(parts[2][1:])))
     return results
+
+
+def available_rounds(
+    race_results: pd.DataFrame | None = None,
+    pred_set: set[tuple[int, int]] | None = None,
+) -> list:
+    """Build list of rounds for the current season from race_results + prediction CSVs.
+
+    Returns ``[((season, round), event_name), ...]`` sorted newest-first.
+    """
+    rounds: dict[tuple[int, int], str] = {}
+
+    if pred_set is None:
+        pred_set = available_predictions()
+
+    # From race_results — current season only
+    if race_results is not None and not race_results.empty:
+        max_season = int(race_results["season"].max())
+        current = race_results[race_results["season"] == max_season]
+        if "race_name" in current.columns:
+            unique = current[["season", "round", "race_name"]].drop_duplicates(["season", "round"])
+            for _, row in unique.iterrows():
+                s, r = int(row["season"]), int(row["round"])
+                name = row["race_name"]
+                rounds[(s, r)] = name if pd.notna(name) else f"Round {r}"
+        else:
+            for _, row in current[["season", "round"]].drop_duplicates().iterrows():
+                rounds[(int(row["season"]), int(row["round"]))] = f"Round {row['round']}"
+
+    # From prediction CSVs (may include future races not yet in results)
+    for s, r in pred_set:
+        if (s, r) not in rounds:
+            rounds[(s, r)] = f"Round {r}"
+
+    return sorted(rounds.items(), key=lambda x: (x[0][0], x[0][1]), reverse=True)
 
 
 def get_event_name(season: int, race_round: int) -> str:

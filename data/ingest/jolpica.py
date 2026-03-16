@@ -355,10 +355,15 @@ class JolpicaClient:
         start_year: int = 1950,
         end_year: int = 2025,
         output_dir: Optional[Path] = None,
+        save_parquet: bool = True,
     ) -> dict[str, pd.DataFrame]:
         """
-        Download all historical data and save as parquet files.
+        Download all historical data and optionally save as parquet files.
         Returns dict of DataFrames.
+
+        Args:
+            save_parquet: If False, return data without writing files.
+                          Used when caller will merge with existing data.
         """
         out = output_dir or (Path(__file__).parent.parent / "cache" / "processed")
         out.mkdir(parents=True, exist_ok=True)
@@ -368,9 +373,10 @@ class JolpicaClient:
         drivers = self.get_drivers()
         constructors = self.get_constructors()
 
-        circuits.to_parquet(out / "circuits.parquet", index=False)
-        drivers.to_parquet(out / "drivers.parquet", index=False)
-        constructors.to_parquet(out / "constructors.parquet", index=False)
+        if save_parquet:
+            circuits.to_parquet(out / "circuits.parquet", index=False)
+            drivers.to_parquet(out / "drivers.parquet", index=False)
+            constructors.to_parquet(out / "constructors.parquet", index=False)
 
         all_results = []
         all_qualifying = []
@@ -407,30 +413,35 @@ class JolpicaClient:
 
         if all_results:
             df = pd.concat(all_results, ignore_index=True)
-            df.to_parquet(out / "race_results.parquet", index=False)
+            if save_parquet:
+                df.to_parquet(out / "race_results.parquet", index=False)
             datasets["race_results"] = df
             logger.info(f"Race results: {len(df)} rows ({df['season'].min()}-{df['season'].max()})")
 
         if all_qualifying:
             df = pd.concat(all_qualifying, ignore_index=True)
-            df.to_parquet(out / "qualifying.parquet", index=False)
+            if save_parquet:
+                df.to_parquet(out / "qualifying.parquet", index=False)
             datasets["qualifying"] = df
             logger.info(f"Qualifying: {len(df)} rows")
 
         if all_sprints:
             df = pd.concat(all_sprints, ignore_index=True)
-            df.to_parquet(out / "sprints.parquet", index=False)
+            if save_parquet:
+                df.to_parquet(out / "sprints.parquet", index=False)
             datasets["sprints"] = df
             logger.info(f"Sprints: {len(df)} rows")
 
         if all_driver_standings:
             df = pd.concat(all_driver_standings, ignore_index=True)
-            df.to_parquet(out / "driver_standings.parquet", index=False)
+            if save_parquet:
+                df.to_parquet(out / "driver_standings.parquet", index=False)
             datasets["driver_standings"] = df
 
         if all_constructor_standings:
             df = pd.concat(all_constructor_standings, ignore_index=True)
-            df.to_parquet(out / "constructor_standings.parquet", index=False)
+            if save_parquet:
+                df.to_parquet(out / "constructor_standings.parquet", index=False)
             datasets["constructor_standings"] = df
 
         datasets["circuits"] = circuits

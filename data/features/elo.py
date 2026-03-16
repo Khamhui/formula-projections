@@ -337,11 +337,44 @@ class F1EloSystem:
             "constructors": self.get_constructor_ratings(),
         }
 
+    def apply_regulation_reset(self, season: int, driver_retain: float, constructor_retain: float):
+        """
+        Partially reset ELO ratings toward the mean at a regulation change boundary.
+
+        Constructor ratings are reset more aggressively since regulations primarily
+        affect car performance. Driver ratings retain more since talent persists.
+
+        Args:
+            season: The regulation change season
+            driver_retain: Fraction of rating to retain for drivers (0 = full reset, 1 = no reset)
+            constructor_retain: Fraction of rating to retain for constructors
+        """
+        mean = _DEFAULT_RATING
+
+        # Reset driver ratings (overall, circuit-type, qualifying, wet)
+        for store in [self.overall, self.qualifying, self.wet]:
+            for driver_id, rating in store.items():
+                rating.rating = mean + (rating.rating - mean) * driver_retain
+
+        for ct_store in self.by_circuit_type.values():
+            for driver_id, rating in ct_store.items():
+                rating.rating = mean + (rating.rating - mean) * driver_retain
+
+        # Reset constructor ratings more aggressively
+        for cid, rating in self.constructors.items():
+            rating.rating = mean + (rating.rating - mean) * constructor_retain
+
+        logger.info(
+            "Regulation reset applied for %d: driver retain=%.2f, constructor retain=%.2f",
+            season, driver_retain, constructor_retain,
+        )
+
 
 def build_elo_from_history(
     race_results: pd.DataFrame,
     qualifying: Optional[pd.DataFrame] = None,
     wet_races: Optional[set[tuple[int, int]]] = None,
+    regulation_resets: Optional[dict[int, dict[str, float]]] = None,
 ) -> F1EloSystem:
     """
     Build ELO ratings from historical race data.
@@ -351,6 +384,8 @@ def build_elo_from_history(
                       driver_id, constructor_id, position, grid
         qualifying: Optional qualifying data
         wet_races: Optional set of (season, round) tuples for wet races
+        regulation_resets: Optional dict of season -> {"driver": retain, "constructor": retain}
+                          for applying regulation change resets at season boundaries
 
     Returns:
         Fully computed F1EloSystem
@@ -361,7 +396,20 @@ def build_elo_from_history(
     # Process chronologically
     race_results = race_results.sort_values(["season", "round"])
 
+    prev_season = None
+
     for (season, rnd), group in race_results.groupby(["season", "round"]):
+        # Apply regulation reset at season boundary
+        if regulation_resets and prev_season is not None and int(season) != prev_season:
+            if int(season) in regulation_resets:
+                reset = regulation_resets[int(season)]
+                elo.apply_regulation_reset(
+                    int(season),
+                    driver_retain=reset.get("driver", 1.0),
+                    constructor_retain=reset.get("constructor", 1.0),
+                )
+        prev_season = int(season)
+
         circuit_id = group.iloc[0]["circuit_id"]
         is_wet = (season, rnd) in wet_races
 

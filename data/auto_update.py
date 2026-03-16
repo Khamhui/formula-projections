@@ -216,7 +216,16 @@ def run_update(
         # Step 3: Re-ingest current season (fast — only 1 year, merged with history)
         print(f"\nStep 3: Re-ingesting {season} season data...")
         from data.pipeline import step_ingest
+        rr_path = DATA_DIR / "race_results.parquet"
+        pre_rows = len(pd.read_parquet(rr_path)) if rr_path.exists() else 0
         step_ingest(start_year=season, end_year=season, merge=True)
+        post_rows = len(pd.read_parquet(rr_path)) if rr_path.exists() else 0
+        if post_rows < pre_rows * 0.5 and pre_rows > 100:
+            raise RuntimeError(
+                f"Data integrity check failed: race_results dropped from "
+                f"{pre_rows} to {post_rows} rows after merge. Aborting."
+            )
+        print(f"  Data integrity OK: {post_rows} rows (was {pre_rows})")
 
         # Step 4: Rebuild features + retrain
         print("\nStep 4: Rebuilding feature matrix...")

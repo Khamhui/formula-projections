@@ -45,6 +45,11 @@ import numpy as np
 from scipy.stats import spearmanr
 
 from data.features.elo import F1EloSystem, CIRCUIT_TYPES, DEFAULT_CIRCUIT_TYPE
+from data.features.regulation import (
+    build_regulation_features,
+    compute_elo_reset_factors,
+    REGULATION_CHANGES,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -901,9 +906,16 @@ def build_feature_matrix(
         .sort_values(["season", "round"])
     )
 
+    # Build regulation reset factors for ELO
+    regulation_resets = {}
+    for year, change in REGULATION_CHANGES.items():
+        regulation_resets[year] = compute_elo_reset_factors(year)
+
     # Build ELO incrementally — we need the state BEFORE each race
     elo = F1EloSystem()
     feature_rows = []
+    _prev_elo_season = None
+    _reg_feature_cache: Dict[int, Dict[str, float]] = {}
 
     # Driver history accumulators (position-based + FastF1-based + sprint + track status)
     driver_history: dict[str, list[dict]] = {}
@@ -930,6 +942,17 @@ def build_feature_matrix(
         rnd = int(race_info["round"])
         circuit_id = race_info["circuit_id"]
         is_wet = (season, rnd) in wet_races
+
+        # Apply regulation ELO reset at season boundaries
+        if _prev_elo_season is not None and season != _prev_elo_season:
+            if season in regulation_resets:
+                reset = regulation_resets[season]
+                elo.apply_regulation_reset(
+                    season,
+                    driver_retain=reset["driver"],
+                    constructor_retain=reset["constructor"],
+                )
+        _prev_elo_season = season
 
         race_data = race_groups[(season, rnd)]
 
@@ -991,6 +1014,11 @@ def build_feature_matrix(
 
             c_elo = elo.constructors.get(constructor_id)
             features["elo_constructor"] = c_elo.rating if c_elo else 1500.0
+
+            # ── Regulation Features (season-level, cached) ──
+            if season not in _reg_feature_cache:
+                _reg_feature_cache[season] = build_regulation_features(season)
+            features.update(_reg_feature_cache[season])
 
             # ELO rank via sorted list (O(n) per driver but O(n log n) sort once)
             features["elo_diff_vs_field"] = features["elo_overall"] - field_elo_mean

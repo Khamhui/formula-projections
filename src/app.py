@@ -10,6 +10,7 @@ Usage:
 
 from __future__ import annotations
 
+import threading
 import time
 from datetime import datetime
 
@@ -20,12 +21,16 @@ from flask import Flask, render_template, request, jsonify
 from src.shared import (
     DATA_DIR,
     available_predictions,
+    available_rounds,
     driver_name,
     get_event_name,
     load_prediction,
+    prediction_mtime,
     team_color_hex,
     team_name,
 )
+
+import math
 
 app = Flask(__name__)
 
@@ -57,6 +62,7 @@ app.jinja_env.globals.update(
     team_color=team_color_hex,
     team_name=team_name,
 )
+app.jinja_env.filters["notnan"] = lambda v: v is not None and (not isinstance(v, float) or not math.isnan(v))
 
 
 def _pos_class(pos) -> str:
@@ -105,11 +111,13 @@ def _filter_round(df: pd.DataFrame, season: int, race_round: int) -> pd.DataFram
     return df[(df["season"] == season) & (df["round"] == race_round)].sort_values("position")
 
 
-def _latest_standings(df: pd.DataFrame, season: int) -> pd.DataFrame:
-    """Get latest standings for a season, sorted by points."""
+def _latest_standings(df: pd.DataFrame, season: int, max_round: int | None = None) -> pd.DataFrame:
+    """Get standings for a season up to max_round, sorted by points."""
     if df.empty or "season" not in df.columns:
         return pd.DataFrame()
     s = df[df["season"] == season]
+    if max_round is not None:
+        s = s[s["round"] <= max_round]
     if s.empty:
         return pd.DataFrame()
     latest_round = s["round"].max()
@@ -127,6 +135,31 @@ def _event_name_from(rr: pd.DataFrame, season: int, race_round: int) -> str:
             if pd.notna(name):
                 return name
     return get_event_name(season, race_round)
+
+
+def _build_sparklines(
+    df: pd.DataFrame, current: pd.DataFrame, season: int, race_round: int,
+    col: str, n: int = 10, as_int: bool = False,
+) -> dict:
+    """Build per-driver sparkline data from a historical DataFrame.
+
+    Filters to drivers in ``current``, excludes future rounds, and returns
+    the last ``n`` values of ``col`` per driver.
+    """
+    if df.empty or current.empty or "driver_id" not in current.columns:
+        return {}
+
+    driver_ids = set(current["driver_id"].unique())
+    recent = df[df["driver_id"].isin(driver_ids)]
+    recent = recent[~((recent["season"] == season) & (recent["round"] > race_round))]
+    recent = recent.sort_values(["season", "round"])
+
+    history: dict = {}
+    for did, group in recent.groupby("driver_id"):
+        vals = group[col].dropna().tail(n).tolist()
+        if len(vals) >= 2:
+            history[did] = [int(v) for v in vals] if as_int else vals
+    return history
 
 
 def _build_elo_data(fm: pd.DataFrame, current: pd.DataFrame, season: int, race_round: int) -> dict:
@@ -159,19 +192,7 @@ def _build_elo_data(fm: pd.DataFrame, current: pd.DataFrame, season: int, race_r
             .to_dict()
         )
 
-    # Sparkline history: last 10 races per driver (single groupby, no N+1)
-    elo_history = {}
-    if not current.empty:
-        driver_ids = set(current["driver_id"].unique())
-        recent = fm[fm["season"] <= season]
-        recent = recent[recent["driver_id"].isin(driver_ids)]
-        if season == fm["season"].max():
-            recent = recent[~((recent["season"] == season) & (recent["round"] > race_round))]
-        recent = recent.sort_values(["season", "round"])
-        for did, group in recent.groupby("driver_id"):
-            vals = group["elo_overall"].dropna().tail(10).tolist()
-            if len(vals) >= 2:
-                elo_history[did] = vals
+    elo_history = _build_sparklines(fm, current, season, race_round, "elo_overall", n=10)
 
     # Circuit type for this race
     circuit_type = "mixed"
@@ -187,6 +208,134 @@ def _build_elo_data(fm: pd.DataFrame, current: pd.DataFrame, season: int, race_r
     }
 
 
+def _build_race_context(current: pd.DataFrame) -> dict:
+    """Extract circuit-specific context for the current race."""
+    if current.empty:
+        return {"circuit_stats": {}, "circuit_drivers": pd.DataFrame()}
+
+    stats = {}
+    stat_cols = {
+        "circuit_grid_correlation": "grid_correlation",
+        "circuit_overtaking_rate": "overtaking_rate",
+        "circuit_attrition_rate": "attrition_rate",
+        "grid_importance_score": "grid_importance",
+        "circuit_front_row_win_rate": "front_row_win_rate",
+    }
+    for col, label in stat_cols.items():
+        if col in current.columns:
+            v = current[col].mean()
+            if pd.notna(v):
+                stats[label] = round(float(v), 2)
+
+    driver_cols = [
+        "driver_id", "constructor_id",
+        "circuit_avg_pos", "circuit_best_pos", "circuit_races",
+        "circuit_podium_rate", "circuit_quali_avg", "circuit_win_streak",
+    ]
+    avail = [c for c in driver_cols if c in current.columns]
+    drivers = current[avail].copy() if len(avail) > 2 else pd.DataFrame()
+    if not drivers.empty and "circuit_avg_pos" in drivers.columns:
+        drivers = drivers.sort_values("circuit_avg_pos").reset_index(drop=True)
+
+    return {"circuit_stats": stats, "circuit_drivers": drivers}
+
+
+def _build_driver_form(current: pd.DataFrame) -> pd.DataFrame:
+    """Extract driver form, momentum, teammate comparison, and pace data."""
+    if current.empty:
+        return pd.DataFrame()
+
+    cols = [
+        "driver_id", "constructor_id",
+        "pos_last3_mean", "pos_last5_mean", "pos_last10_mean",
+        "momentum_score", "form_vs_season_avg", "season_avg_pos",
+        "h2h_quali_rate", "teammate_elo_diff",
+        "dnf_rate_last5", "dnf_rate_last10", "dnf_streak",
+        "quali_delta_vs_field", "quali_improvement_pct",
+        "fp_delta_vs_field", "fp_total_laps",
+    ]
+    avail = [c for c in cols if c in current.columns]
+    if len(avail) <= 2:
+        return pd.DataFrame()
+    df = current[avail].copy()
+    if "momentum_score" in df.columns:
+        df = df.sort_values("momentum_score", ascending=False)
+    return df.reset_index(drop=True)
+
+
+_FORM_SORT_SPECS = {
+    "form_by_quali": ("quali_delta_vs_field", True),
+    "form_by_pos": ("pos_last5_mean", True),
+    "form_by_h2h": ("h2h_quali_rate", False),
+    "form_by_dnf": ("dnf_rate_last5", False),
+}
+
+
+def _presort_driver_form(df: pd.DataFrame) -> dict:
+    """Pre-sort driver form for template use (avoids sort_values in Jinja)."""
+    if df.empty:
+        return {}
+    views = {}
+    for key, (col, ascending) in _FORM_SORT_SPECS.items():
+        if col in df.columns:
+            views[key] = df.sort_values(col, ascending=ascending).reset_index(drop=True)
+    return views
+
+
+def _build_constructor_trends(current: pd.DataFrame) -> pd.DataFrame:
+    """Extract constructor development trajectory data."""
+    if current.empty:
+        return pd.DataFrame()
+
+    cols = [
+        "constructor_id",
+        "constructor_pace_jump", "constructor_pace_jump_magnitude",
+        "constructor_season_trend", "constructor_season_avg",
+        "elo_constructor",
+    ]
+    avail = [c for c in cols if c in current.columns]
+    if "constructor_id" not in avail:
+        return pd.DataFrame()
+    df = current[avail].drop_duplicates("constructor_id").copy()
+    if "elo_constructor" in df.columns:
+        df = df.sort_values("elo_constructor", ascending=False)
+    return df.reset_index(drop=True)
+
+
+def _build_prediction_accuracy(pred, race: pd.DataFrame):
+    """Compare prediction vs actual race result."""
+    if pred is None or pred.empty or race.empty:
+        return None
+    if "driver_id" not in race.columns:
+        return None
+
+    pred_cols = ["driver_id", "predicted_position"]
+    for c in ["sim_win_pct", "sim_podium_pct", "sim_points_pct"]:
+        if c in pred.columns:
+            pred_cols.append(c)
+
+    merged = pred[pred_cols].merge(
+        race[["driver_id", "position"]].rename(columns={"position": "actual"}),
+        on="driver_id", how="inner",
+    )
+    if merged.empty:
+        return None
+
+    merged["delta"] = merged["actual"] - merged["predicted_position"]
+    return merged.sort_values("actual").reset_index(drop=True)
+
+
+def _build_position_history(
+    rr: pd.DataFrame, current: pd.DataFrame, season: int, race_round: int,
+) -> dict:
+    """Build last-8 race positions per driver for sparklines."""
+    if rr.empty:
+        return {}
+    # Filter to recent seasons to avoid scanning full history
+    recent_rr = rr[rr["season"] >= season - 2]
+    return _build_sparklines(recent_rr, current, season, race_round, "position", n=8, as_int=True)
+
+
 # ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
@@ -194,13 +343,18 @@ def _build_elo_data(fm: pd.DataFrame, current: pd.DataFrame, season: int, race_r
 @app.route("/")
 def index():
     """Single-page terminal dashboard — all data in one view."""
-    preds = available_predictions()
+    # Results (needed for round list + race display)
+    rr = _load("race_results")
+
+    # Build full round list from results + prediction CSVs
+    pred_set = available_predictions()
+    all_rounds = available_rounds(rr, pred_set=pred_set)
 
     season = request.args.get("season", type=int)
     race_round = request.args.get("round", type=int)
 
-    if (not season or not race_round) and preds:
-        season, race_round, _ = preds[0]
+    if (not season or not race_round) and all_rounds:
+        (season, race_round), _ = all_rounds[0]
     elif not season:
         season, race_round = 2026, 1
 
@@ -225,8 +379,7 @@ def index():
     if pred is not None and "sim_dnf_pct" in pred.columns:
         dnf_sorted = pred.sort_values("sim_dnf_pct", ascending=False)
 
-    # Results (qualifying, sprint, race)
-    rr = _load("race_results")
+    # Results (qualifying, sprint, race) — rr already loaded above
     q = _load("qualifying")
     sp = _load("sprints")
 
@@ -237,12 +390,23 @@ def index():
     # Event name from already-loaded race_results
     event = _event_name_from(rr, season, race_round)
 
-    # Standings
-    driver_s = _latest_standings(_load("driver_standings"), season)
-    constructor_s = _latest_standings(_load("constructor_standings"), season)
+    # Standings — scoped to selected round
+    driver_s = _latest_standings(_load("driver_standings"), season, race_round)
+    constructor_s = _latest_standings(_load("constructor_standings"), season, race_round)
+
+    # Prediction freshness
+    pred_generated = prediction_mtime(season, race_round)
 
     # ELO data
     elo_data = _build_elo_data(fm, current, season, race_round)
+
+    # New data layers
+    race_context = _build_race_context(current)
+    driver_form = _build_driver_form(current)
+    form_views = _presort_driver_form(driver_form)
+    constructor_trends = _build_constructor_trends(current)
+    pred_accuracy = _build_prediction_accuracy(pred, race)
+    position_history = _build_position_history(rr, current, season, race_round)
 
     return render_template(
         "terminal.html",
@@ -251,13 +415,21 @@ def index():
         event_name=event,
         season=season,
         race_round=race_round,
-        available=preds,
+        all_rounds=all_rounds,
+        pred_set=pred_set,
+        pred_generated=pred_generated,
         race=race,
         quali=quali,
         sprint=sprint,
         drivers=driver_s,
         constructors=constructor_s,
         now=datetime.now().strftime("%Y-%m-%d %H:%M"),
+        race_context=race_context,
+        driver_form=driver_form,
+        constructor_trends=constructor_trends,
+        pred_accuracy=pred_accuracy,
+        position_history=position_history,
+        **form_views,
         **elo_data,
     )
 
@@ -303,6 +475,64 @@ def api_news():
 
 
 # ---------------------------------------------------------------------------
+# Prediction runner
+# ---------------------------------------------------------------------------
+
+_predict_lock = threading.Lock()
+_predict_status: dict = {"running": False, "result": None, "error": None}
+
+
+@app.route("/api/predict", methods=["POST"])
+def api_predict():
+    """Trigger prediction for a given season/round in a background thread."""
+    data = request.json or {}
+    season = data.get("season")
+    race_round = data.get("round")
+    mode = data.get("mode", "predict")
+
+    if mode not in ("predict", "full"):
+        return jsonify({"error": "mode must be 'predict' or 'full'"}), 400
+    if not season or not race_round:
+        return jsonify({"error": "season and round required"}), 400
+
+    with _predict_lock:
+        if _predict_status["running"]:
+            return jsonify({"status": "already_running"}), 409
+        _predict_status["running"] = True
+        _predict_status["result"] = None
+        _predict_status["error"] = None
+
+    def run():
+        try:
+            if mode == "full":
+                from data.auto_update import run_update
+                run_update(force=True)
+            else:
+                from data.predict_weekend import run_weekend_prediction
+                run_weekend_prediction(season, race_round)
+            with _predict_lock:
+                _predict_status["result"] = "done"
+        except Exception as e:
+            with _predict_lock:
+                _predict_status["error"] = str(e)
+        finally:
+            with _predict_lock:
+                _predict_status["running"] = False
+            _cache_ts.clear()
+
+    threading.Thread(target=run, daemon=True).start()
+    return jsonify({"status": "started", "season": season, "round": race_round, "mode": mode})
+
+
+@app.route("/api/predict/status")
+def api_predict_status():
+    """Poll prediction progress."""
+    with _predict_lock:
+        snapshot = _predict_status.copy()
+    return jsonify(snapshot)
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
@@ -310,7 +540,6 @@ def start(port: int = 5050, open_browser: bool = True):
     """Start the dashboard server."""
     if open_browser:
         import webbrowser
-        import threading
         threading.Timer(1.0, lambda: webbrowser.open(f"http://localhost:{port}")).start()
 
     app.run(host="127.0.0.1", port=port, debug=False)
