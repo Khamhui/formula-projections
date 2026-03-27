@@ -27,33 +27,9 @@ final class DataStore {
     // News
     var newsHeadlines: [NewsHeadline] = []
 
-    // Derived data (computed from predictions)
-    var predictionInsight: PredictionInsight {
-        guard let winner = predictions.first else {
-            return PredictionInsight(winnerId: "", whySentence: "Loading predictions...", casualDescription: "")
-        }
-        return PredictionInsight(
-            winnerId: winner.id,
-            whySentence: "\(winner.teamName)'s technical circuit mastery and \(winner.driverName)'s qualifying edge give him a clear advantage at the upcoming race.",
-            casualDescription: "About 1 in \(max(2, Int(round(100.0 / max(winner.simWinPct, 1))))) chance of winning"
-        )
-    }
-
-    var teammateH2H: [TeammateH2H] {
-        let teams = Dictionary(grouping: driverStandings, by: \.teamId)
-        return teams.compactMap { teamId, drivers in
-            guard drivers.count >= 2 else { return nil }
-            let sorted = drivers.sorted { $0.position < $1.position }
-            let d1 = sorted[0], d2 = sorted[1]
-            return TeammateH2H(
-                driver1Id: d1.id, driver1Name: d1.driverName,
-                driver2Id: d2.id, driver2Name: d2.driverName,
-                teamId: teamId, teamName: F1Team.from(apiId: teamId)?.displayName ?? teamId.capitalized,
-                driver1QualiWins: d1.wins, driver2QualiWins: d2.wins,
-                driver1RaceWins: d1.wins, driver2RaceWins: d2.wins
-            )
-        }.sorted { $0.teamName < $1.teamName }
-    }
+    // Derived data (cached, rebuilt on fetch)
+    var predictionInsight: PredictionInsight = PredictionInsight(winnerId: "", whySentence: "Loading predictions...", casualDescription: "")
+    var teammateH2H: [TeammateH2H] = []
 
     var whoToWatch: [WhoToWatch] {
         Array(predictions.prefix(3).map { p in
@@ -97,8 +73,39 @@ final class DataStore {
 
         await t1; await t2; await t3; await t4; await t5; await t6; await t7; await t8
 
+        rebuildDerivedData()
         isLoading = false
         lastFetched = Date()
+    }
+
+    private func rebuildDerivedData() {
+        rebuildPredictionInsight()
+        rebuildTeammateH2H()
+    }
+
+    private func rebuildPredictionInsight() {
+        guard let winner = predictions.first else { return }
+        predictionInsight = PredictionInsight(
+            winnerId: winner.id,
+            whySentence: "\(winner.teamName)'s technical circuit mastery and \(winner.driverName)'s qualifying edge give him a clear advantage at the upcoming race.",
+            casualDescription: "About 1 in \(max(2, Int(round(100.0 / max(winner.simWinPct, 1))))) chance of winning"
+        )
+    }
+
+    private func rebuildTeammateH2H() {
+        let teams = Dictionary(grouping: driverStandings, by: \.teamId)
+        teammateH2H = teams.compactMap { teamId, drivers in
+            guard drivers.count >= 2 else { return nil }
+            let sorted = drivers.sorted { $0.position < $1.position }
+            let d1 = sorted[0], d2 = sorted[1]
+            return TeammateH2H(
+                driver1Id: d1.id, driver1Name: d1.driverName,
+                driver2Id: d2.id, driver2Name: d2.driverName,
+                teamId: teamId, teamName: F1Team.from(apiId: teamId)?.displayName ?? teamId.capitalized,
+                driver1QualiWins: d1.wins, driver2QualiWins: d2.wins,
+                driver1RaceWins: d1.wins, driver2RaceWins: d2.wins
+            )
+        }.sorted { $0.teamName < $1.teamName }
     }
 
     // MARK: - Fetchers
@@ -212,6 +219,21 @@ final class DataStore {
     }
 
     private func fetchCircuitData() async {
+        async let circuitTask: Void = fetchCircuit()
+        async let scheduleTask: Void = fetchSessionSchedule()
+        async let weatherTask: Void = fetchWeather()
+        async let specialistsTask: Void = fetchTrackSpecialists()
+        async let winnersTask: Void = fetchRecentWinners()
+
+        await circuitTask; await scheduleTask; await weatherTask; await specialistsTask; await winnersTask
+
+        if var info = circuitInfo, !recentWinners.isEmpty {
+            info.recentWinners = recentWinners
+            circuitInfo = info
+        }
+    }
+
+    private func fetchCircuit() async {
         do {
             let circuits = try await SupabaseClient.fetch(
                 "circuits", query: "id=eq.suzuka&select=*", as: [SBCircuit].self
@@ -225,11 +247,14 @@ final class DataStore {
                 )
                 circuitProfile = CircuitProfile(
                     gridCorrelation: c.gridCorrelation ?? 0.5, overtakingRate: c.overtakingRate ?? 0.3,
-                    attritionRate: 0.15, gridImportance: 0.7, frontRowWinRate: 0.65
+                    attritionRate: c.attritionRate ?? 0.15, gridImportance: c.gridImportance ?? 0.7,
+                    frontRowWinRate: c.frontRowWinRate ?? 0.65
                 )
             }
         } catch { }
+    }
 
+    private func fetchSessionSchedule() async {
         do {
             let schedule = try await SupabaseClient.fetch(
                 "session_schedule", query: "race_id=eq.2026-r03-suzuka&select=session,day,time", as: [SBSessionSchedule].self
@@ -238,17 +263,21 @@ final class DataStore {
                 sessionSchedule = schedule.map { SessionScheduleEntry(session: $0.session, day: $0.day, time: $0.time) }
             }
         } catch { }
+    }
 
+    private func fetchWeather() async {
         do {
-            let w = try await SupabaseClient.fetch(
+            let results = try await SupabaseClient.fetch(
                 "weather", query: "race_id=eq.2026-r03-suzuka&select=*", as: [SBWeather].self
             )
-            if let w = w.first {
+            if let w = results.first {
                 weather = WeatherForecast(tempC: w.tempC ?? 0, rainPct: w.rainPct ?? 0,
                                           windKmh: w.windKmh ?? 0, humidityPct: w.humidityPct ?? 0)
             }
         } catch { }
+    }
 
+    private func fetchTrackSpecialists() async {
         do {
             let specs = try await SupabaseClient.fetch(
                 "track_specialists", query: "circuit_id=eq.suzuka&order=avg_position&select=*", as: [SBTrackSpecialist].self
@@ -260,7 +289,9 @@ final class DataStore {
                 }
             }
         } catch { }
+    }
 
+    private func fetchRecentWinners() async {
         do {
             let winners = try await SupabaseClient.fetch(
                 "recent_winners", query: "circuit_id=eq.suzuka&order=season.desc&select=*", as: [SBRecentWinner].self
@@ -268,10 +299,6 @@ final class DataStore {
             if !winners.isEmpty {
                 recentWinners = winners.map { w in
                     RecentWinner(season: w.season, driver: w.driverName, teamId: w.teamId)
-                }
-                if var info = circuitInfo {
-                    info.recentWinners = recentWinners
-                    circuitInfo = info
                 }
             }
         } catch { }

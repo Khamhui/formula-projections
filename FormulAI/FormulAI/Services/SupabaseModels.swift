@@ -99,6 +99,9 @@ struct SBCircuit: Codable {
     let lapRecord: String?
     let gridCorrelation: Double?
     let overtakingRate: Double?
+    let attritionRate: Double?
+    let gridImportance: Double?
+    let frontRowWinRate: Double?
     let description: String?
 }
 
