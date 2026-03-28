@@ -1,0 +1,1204 @@
+2026-03-24 22:48:29,215 [INFO] __main__: Invalidated 5 cache files for season 2026
+2026-03-24 22:48:29,567 [INFO] data.pipeline: ============================================================
+2026-03-24 22:48:29,567 [INFO] data.pipeline: STEP 1: Data Ingestion
+2026-03-24 22:48:29,567 [INFO] data.pipeline: ============================================================
+2026-03-24 22:48:29,567 [INFO] data.pipeline: Ingesting from Jolpica (2026–2026)...
+2026-03-24 22:48:29,567 [INFO] data.ingest.jolpica: Fetching static reference data...
+2026-03-24 22:48:29,599 [INFO] data.ingest.jolpica: Ingesting season 2026...
+2026-03-24 22:48:34,957 [INFO] data.ingest.jolpica: Race results: 44 rows (2026-2026)
+2026-03-24 22:48:34,957 [INFO] data.ingest.jolpica: Qualifying: 41 rows
+2026-03-24 22:48:34,957 [INFO] data.ingest.jolpica: Sprints: 22 rows
+2026-03-24 22:48:34,958 [INFO] data.ingest.jolpica: Ingestion complete. 8 datasets saved to /Users/julien.l/Documents/GitHub/formula-projections/data/cache/processed
+2026-03-24 22:48:35,009 [INFO] data.pipeline:   Merged race_results: kept 9445 historic + 44 new = 9489 total
+2026-03-24 22:48:35,023 [INFO] data.pipeline:   Merged qualifying: kept 9425 historic + 41 new = 9466 total
+2026-03-24 22:48:35,027 [INFO] data.pipeline:   Merged sprints: kept 480 historic + 22 new = 502 total
+2026-03-24 22:48:35,031 [INFO] data.pipeline:   Merged driver_standings: kept 547 historic + 22 new = 569 total
+2026-03-24 22:48:35,035 [INFO] data.pipeline:   Merged constructor_standings: kept 243 historic + 11 new = 254 total
+2026-03-24 22:48:35,035 [INFO] data.pipeline:   race_results: 9,489 rows
+2026-03-24 22:48:35,035 [INFO] data.pipeline:   qualifying: 9,466 rows
+2026-03-24 22:48:35,035 [INFO] data.pipeline:   sprints: 502 rows
+2026-03-24 22:48:35,035 [INFO] data.pipeline:   driver_standings: 569 rows
+2026-03-24 22:48:35,035 [INFO] data.pipeline:   constructor_standings: 254 rows
+2026-03-24 22:48:35,035 [INFO] data.pipeline:   circuits: 78 rows
+2026-03-24 22:48:35,035 [INFO] data.pipeline:   drivers: 879 rows
+2026-03-24 22:48:35,035 [INFO] data.pipeline:   constructors: 214 rows
+2026-03-24 22:48:35,038 [INFO] data.pipeline: 
+Ingesting from FastF1 (2018+)...
+2026-03-24 22:48:35,191 [INFO] data.ingest.fastf1_ingest: Ingesting FastF1 data for 2026...
+2026-03-24 22:48:35,514 [INFO] fastf1.fastf1.core: Loading data for Australian Grand Prix - Race [v3.7.0]
+2026-03-24 22:48:35,514 [INFO] fastf1.fastf1.req: Using cached data for session_info
+2026-03-24 22:48:35,515 [INFO] fastf1.fastf1.req: Using cached data for driver_info
+2026-03-24 22:48:35,699 [INFO] fastf1.fastf1.req: Using cached data for session_status_data
+2026-03-24 22:48:35,700 [INFO] fastf1.fastf1.req: Using cached data for lap_count
+2026-03-24 22:48:35,700 [INFO] fastf1.fastf1.req: Using cached data for track_status_data
+2026-03-24 22:48:35,704 [INFO] fastf1.fastf1.req: Using cached data for _extended_timing_data
+2026-03-24 22:48:35,705 [INFO] fastf1.fastf1.req: Using cached data for timing_app_data
+2026-03-24 22:48:35,705 [INFO] fastf1.fastf1.core: Processing timing data...
+2026-03-24 22:48:36,010 [WARNING] fastf1.fastf1.core: No lap data for driver 81
+2026-03-24 22:48:36,159 [WARNING] fastf1.fastf1.core: Failed to perform lap accuracy check - all laps marked as inaccurate (driver 81)
+2026-03-24 22:48:36,225 [INFO] fastf1.fastf1.req: Using cached data for weather_data
+2026-03-24 22:48:36,271 [INFO] fastf1.fastf1.core: Finished loading data for 22 drivers: ['63', '12', '16', '44', '1', '3', '87', '41', '5', '10', '31', '23', '30', '43', '55', '11', '18', '14', '77', '6', '81', '27']
+2026-03-24 22:48:36,281 [INFO] fastf1.fastf1.core: Loading data for Australian Grand Prix - Qualifying [v3.7.0]
+2026-03-24 22:48:36,281 [INFO] fastf1.fastf1.req: Using cached data for session_info
+2026-03-24 22:48:36,281 [INFO] fastf1.fastf1.req: Using cached data for driver_info
+2026-03-24 22:48:36,461 [DEBUG] fastf1.ergast: Failed to parse timestamp '' in Ergastresponse.
+2026-03-24 22:48:36,469 [INFO] fastf1.fastf1.req: Using cached data for session_status_data
+2026-03-24 22:48:36,470 [INFO] fastf1.fastf1.req: Using cached data for track_status_data
+2026-03-24 22:48:36,472 [INFO] fastf1.fastf1.req: Using cached data for _extended_timing_data
+2026-03-24 22:48:36,472 [INFO] fastf1.fastf1.req: Using cached data for timing_app_data
+2026-03-24 22:48:36,472 [INFO] fastf1.fastf1.core: Processing timing data...
+2026-03-24 22:48:36,659 [WARNING] fastf1.fastf1.core: No lap data for driver 18
+2026-03-24 22:48:36,663 [WARNING] fastf1.fastf1.core: No lap data for driver 55
+2026-03-24 22:48:36,714 [WARNING] fastf1.fastf1.core: Failed to perform lap accuracy check - all laps marked as inaccurate (driver 18)
+2026-03-24 22:48:36,716 [WARNING] fastf1.fastf1.core: Failed to perform lap accuracy check - all laps marked as inaccurate (driver 55)
+2026-03-24 22:48:36,717 [INFO] fastf1.fastf1.req: Using cached data for weather_data
+2026-03-24 22:48:36,731 [INFO] fastf1.fastf1.core: Finished loading data for 22 drivers: ['63', '12', '6', '16', '81', '1', '44', '30', '41', '5', '27', '87', '31', '10', '23', '43', '14', '11', '77', '18', '3', '55']
+2026-03-24 22:48:36,741 [INFO] fastf1.fastf1.core: Loading data for Australian Grand Prix - Practice 1 [v3.7.0]
+2026-03-24 22:48:36,741 [INFO] fastf1.fastf1.req: Using cached data for session_info
+2026-03-24 22:48:36,742 [INFO] fastf1.fastf1.req: Using cached data for driver_info
+2026-03-24 22:48:36,752 [INFO] fastf1.fastf1.req: Using cached data for session_status_data
+2026-03-24 22:48:36,753 [INFO] fastf1.fastf1.req: Using cached data for track_status_data
+2026-03-24 22:48:36,754 [INFO] fastf1.fastf1.req: Using cached data for _extended_timing_data
+2026-03-24 22:48:36,754 [INFO] fastf1.fastf1.req: Using cached data for timing_app_data
+2026-03-24 22:48:36,754 [INFO] fastf1.fastf1.core: Processing timing data...
+2026-03-24 22:48:36,819 [WARNING] fastf1.fastf1.core: No lap data for driver 14
+2026-03-24 22:48:36,972 [WARNING] fastf1.fastf1.core: Failed to perform lap accuracy check - all laps marked as inaccurate (driver 14)
+2026-03-24 22:48:37,006 [INFO] fastf1.fastf1.req: Using cached data for weather_data
+2026-03-24 22:48:37,020 [INFO] fastf1.fastf1.core: Finished loading data for 22 drivers: ['1', '3', '5', '6', '10', '11', '12', '14', '16', '18', '23', '27', '30', '31', '41', '43', '44', '55', '63', '77', '81', '87']
+2026-03-24 22:48:37,031 [INFO] fastf1.fastf1.core: Loading data for Australian Grand Prix - Practice 2 [v3.7.0]
+2026-03-24 22:48:37,032 [INFO] fastf1.fastf1.req: Using cached data for session_info
+2026-03-24 22:48:37,033 [INFO] fastf1.fastf1.req: Using cached data for driver_info
+2026-03-24 22:48:37,043 [INFO] fastf1.fastf1.req: Using cached data for session_status_data
+2026-03-24 22:48:37,044 [INFO] fastf1.fastf1.req: Using cached data for track_status_data
+2026-03-24 22:48:37,045 [INFO] fastf1.fastf1.req: Using cached data for _extended_timing_data
+2026-03-24 22:48:37,045 [INFO] fastf1.fastf1.req: Using cached data for timing_app_data
+2026-03-24 22:48:37,045 [INFO] fastf1.fastf1.core: Processing timing data...
+2026-03-24 22:48:37,302 [INFO] fastf1.fastf1.req: Using cached data for weather_data
+2026-03-24 22:48:37,318 [INFO] fastf1.fastf1.core: Finished loading data for 22 drivers: ['1', '3', '5', '6', '10', '11', '12', '14', '16', '18', '23', '27', '30', '31', '41', '43', '44', '55', '63', '77', '81', '87']
+2026-03-24 22:48:37,330 [INFO] fastf1.fastf1.core: Loading data for Australian Grand Prix - Practice 3 [v3.7.0]
+2026-03-24 22:48:37,331 [INFO] fastf1.fastf1.req: Using cached data for session_info
+2026-03-24 22:48:37,331 [INFO] fastf1.fastf1.req: Using cached data for driver_info
+2026-03-24 22:48:37,343 [INFO] fastf1.fastf1.req: Using cached data for session_status_data
+2026-03-24 22:48:37,343 [INFO] fastf1.fastf1.req: Using cached data for track_status_data
+2026-03-24 22:48:37,345 [INFO] fastf1.fastf1.req: Using cached data for _extended_timing_data
+2026-03-24 22:48:37,345 [INFO] fastf1.fastf1.req: Using cached data for timing_app_data
+2026-03-24 22:48:37,345 [INFO] fastf1.fastf1.core: Processing timing data...
+2026-03-24 22:48:37,425 [WARNING] fastf1.fastf1.core: No lap data for driver 18
+2026-03-24 22:48:37,553 [WARNING] fastf1.fastf1.core: Failed to perform lap accuracy check - all laps marked as inaccurate (driver 18)
+2026-03-24 22:48:37,575 [INFO] fastf1.fastf1.req: Using cached data for weather_data
+2026-03-24 22:48:37,589 [INFO] fastf1.fastf1.core: Finished loading data for 22 drivers: ['1', '3', '5', '6', '10', '11', '12', '14', '16', '18', '23', '27', '30', '31', '41', '43', '44', '55', '63', '77', '81', '87']
+2026-03-24 22:48:37,599 [INFO] fastf1.fastf1.core: Loading data for Chinese Grand Prix - Race [v3.7.0]
+2026-03-24 22:48:37,601 [INFO] fastf1.fastf1.req: Using cached data for session_info
+2026-03-24 22:48:37,601 [INFO] fastf1.fastf1.req: Using cached data for driver_info
+2026-03-24 22:48:37,661 [INFO] fastf1.fastf1.req: Using cached data for session_status_data
+2026-03-24 22:48:37,664 [INFO] fastf1.fastf1.req: Using cached data for lap_count
+2026-03-24 22:48:37,664 [INFO] fastf1.fastf1.req: Using cached data for track_status_data
+2026-03-24 22:48:37,669 [INFO] fastf1.fastf1.req: Using cached data for _extended_timing_data
+2026-03-24 22:48:37,670 [INFO] fastf1.fastf1.req: Using cached data for timing_app_data
+2026-03-24 22:48:37,670 [INFO] fastf1.fastf1.core: Processing timing data...
+2026-03-24 22:48:38,074 [INFO] fastf1.fastf1.req: Using cached data for weather_data
+2026-03-24 22:48:38,076 [WARNING] fastf1.fastf1.core: Driver 12 completed the race distance 00:00.022000 before the recorded end of the session.
+2026-03-24 22:48:38,102 [INFO] fastf1.fastf1.core: Finished loading data for 22 drivers: ['12', '63', '44', '16', '87', '10', '30', '6', '55', '43', '27', '41', '77', '31', '11', '3', '14', '18', '81', '1', '5', '23']
+2026-03-24 22:48:38,115 [INFO] fastf1.fastf1.core: Loading data for Chinese Grand Prix - Qualifying [v3.7.0]
+2026-03-24 22:48:38,116 [INFO] fastf1.fastf1.req: Using cached data for session_info
+2026-03-24 22:48:38,116 [INFO] fastf1.fastf1.req: Using cached data for driver_info
+2026-03-24 22:48:38,326 [INFO] fastf1.fastf1.req: Using cached data for session_status_data
+2026-03-24 22:48:38,327 [INFO] fastf1.fastf1.req: Using cached data for track_status_data
+2026-03-24 22:48:38,329 [INFO] fastf1.fastf1.req: Using cached data for _extended_timing_data
+2026-03-24 22:48:38,329 [INFO] fastf1.fastf1.req: Using cached data for timing_app_data
+2026-03-24 22:48:38,329 [INFO] fastf1.fastf1.core: Processing timing data...
+2026-03-24 22:48:38,621 [INFO] fastf1.fastf1.req: Using cached data for weather_data
+2026-03-24 22:48:38,638 [INFO] fastf1.fastf1.core: Finished loading data for 22 drivers: ['12', '63', '44', '16', '81', '1', '10', '3', '6', '87', '27', '43', '31', '30', '41', '5', '55', '23', '14', '77', '18', '11']
+2026-03-24 22:48:38,684 [INFO] fastf1.fastf1.core: Loading data for Chinese Grand Prix - Practice 1 [v3.7.0]
+2026-03-24 22:48:38,684 [INFO] fastf1.fastf1.req: Using cached data for session_info
+2026-03-24 22:48:38,684 [INFO] fastf1.fastf1.req: Using cached data for driver_info
+2026-03-24 22:48:38,696 [INFO] fastf1.fastf1.req: Using cached data for session_status_data
+2026-03-24 22:48:38,697 [INFO] fastf1.fastf1.req: Using cached data for track_status_data
+2026-03-24 22:48:38,699 [INFO] fastf1.fastf1.req: Using cached data for _extended_timing_data
+2026-03-24 22:48:38,701 [INFO] fastf1.fastf1.req: Using cached data for timing_app_data
+2026-03-24 22:48:38,701 [INFO] fastf1.fastf1.core: Processing timing data...
+2026-03-24 22:48:38,981 [INFO] fastf1.fastf1.req: Using cached data for weather_data
+2026-03-24 22:48:38,999 [INFO] fastf1.fastf1.core: Finished loading data for 22 drivers: ['1', '3', '5', '6', '10', '11', '12', '14', '16', '18', '23', '27', '30', '31', '41', '43', '44', '55', '63', '77', '81', '87']
+2026-03-24 22:48:39,011 [WARNING] data.ingest.fastf1_ingest: Failed to load 2026 2 FP2: Session type 'FP2' does not exist for this event
+2026-03-24 22:48:39,018 [WARNING] data.ingest.fastf1_ingest: Failed to load 2026 2 FP3: Session type 'FP3' does not exist for this event
+2026-03-24 22:48:39,027 [INFO] fastf1.fastf1.core: Loading data for Japanese Grand Prix - Race [v3.7.0]
+2026-03-24 22:48:39,027 [INFO] fastf1.fastf1.req: No cached data found for session_info. Loading data...
+2026-03-24 22:48:39,027 [INFO] fastf1.api: Fetching session info data...
+2026-03-24 22:48:39,348 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:39,718 [WARNING] fastf1.fastf1.core: Failed to load session info data!
+2026-03-24 22:48:39,719 [DEBUG] fastf1.fastf1.core: Traceback for failure in session info data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1430, in _load_session_info
+    self._session_info = api.session_info(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1714, in session_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:39,741 [INFO] fastf1.fastf1.req: No cached data found for driver_info. Loading data...
+2026-03-24 22:48:39,741 [INFO] fastf1.api: Fetching driver list...
+2026-03-24 22:48:39,871 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:40,323 [WARNING] fastf1.fastf1.core: Failed to load extended driver information!
+2026-03-24 22:48:40,323 [DEBUG] fastf1.fastf1.core: Exception while loading driver list
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2365, in _drivers_from_f1_api
+    f1di = api.driver_info(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1562, in driver_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:40,374 [WARNING] fastf1.fastf1.core: No result data for this session available on Ergast! (This is expected for recent sessions)
+2026-03-24 22:48:40,374 [WARNING] fastf1.fastf1.core: Failed to load driver list and session results!
+2026-03-24 22:48:40,382 [INFO] fastf1.fastf1.req: No cached data found for session_status_data. Loading data...
+2026-03-24 22:48:40,382 [INFO] fastf1.api: Fetching session status data...
+2026-03-24 22:48:40,716 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:41,017 [WARNING] fastf1.fastf1.core: Failed to load session status data!
+2026-03-24 22:48:41,017 [DEBUG] fastf1.fastf1.core: Traceback for failure in session status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2073, in _load_session_status_data
+    session_status = api.session_status_data(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1360, in session_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:41,019 [INFO] fastf1.fastf1.req: No cached data found for lap_count. Loading data...
+2026-03-24 22:48:41,019 [INFO] fastf1.api: Fetching lap count data...
+2026-03-24 22:48:41,194 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:41,514 [WARNING] fastf1.fastf1.core: Failed to load total lap count!
+2026-03-24 22:48:41,514 [DEBUG] fastf1.fastf1.core: Traceback for failure in total lap count
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2055, in _load_total_lap_count
+    lap_count = api.lap_count(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1503, in lap_count
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:41,515 [INFO] fastf1.fastf1.req: No cached data found for track_status_data. Loading data...
+2026-03-24 22:48:41,515 [INFO] fastf1.api: Fetching track status data...
+2026-03-24 22:48:41,704 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:42,006 [WARNING] fastf1.fastf1.core: Failed to load track status data!
+2026-03-24 22:48:42,007 [DEBUG] fastf1.fastf1.core: Traceback for failure in track status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2042, in _load_track_status_data
+    track_status = api.track_status_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1304, in track_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:42,008 [INFO] fastf1.fastf1.req: No cached data found for _extended_timing_data. Loading data...
+2026-03-24 22:48:42,008 [INFO] fastf1.api: Fetching timing data...
+2026-03-24 22:48:42,204 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:42,531 [WARNING] fastf1.fastf1.core: Failed to load timing data!
+2026-03-24 22:48:42,532 [DEBUG] fastf1.fastf1.core: Traceback for failure in lap timing data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1436, in _load_laps_data
+    = api._extended_timing_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 200, in _extended_timing_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:42,644 [WARNING] fastf1.fastf1.core: Cannot load lap times for first lap from Ergast. Timing data is not available for this session.
+2026-03-24 22:48:42,644 [INFO] fastf1.fastf1.req: No cached data found for weather_data. Loading data...
+2026-03-24 22:48:42,644 [INFO] fastf1.api: Fetching weather data...
+2026-03-24 22:48:42,946 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:43,268 [WARNING] fastf1.fastf1.core: Failed to load weather data!
+2026-03-24 22:48:43,268 [DEBUG] fastf1.fastf1.core: Traceback for failure in weather data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2517, in _load_weather_data
+    weather_data = api.weather_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1640, in weather_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:43,270 [INFO] fastf1.fastf1.core: Finished loading data for 0 drivers: []
+2026-03-24 22:48:43,271 [WARNING] data.ingest.fastf1_ingest: Failed to load 2026 3 R: The data you are trying to access has not been loaded yet. See `Session.load`
+2026-03-24 22:48:43,297 [INFO] fastf1.fastf1.core: Loading data for Japanese Grand Prix - Qualifying [v3.7.0]
+2026-03-24 22:48:43,297 [INFO] fastf1.fastf1.req: No cached data found for session_info. Loading data...
+2026-03-24 22:48:43,298 [INFO] fastf1.api: Fetching session info data...
+2026-03-24 22:48:43,457 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:43,771 [WARNING] fastf1.fastf1.core: Failed to load session info data!
+2026-03-24 22:48:43,772 [DEBUG] fastf1.fastf1.core: Traceback for failure in session info data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1430, in _load_session_info
+    self._session_info = api.session_info(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1714, in session_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:43,773 [INFO] fastf1.fastf1.req: No cached data found for driver_info. Loading data...
+2026-03-24 22:48:43,773 [INFO] fastf1.api: Fetching driver list...
+2026-03-24 22:48:43,956 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:44,289 [WARNING] fastf1.fastf1.core: Failed to load extended driver information!
+2026-03-24 22:48:44,290 [DEBUG] fastf1.fastf1.core: Exception while loading driver list
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2365, in _drivers_from_f1_api
+    f1di = api.driver_info(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1562, in driver_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:44,389 [WARNING] fastf1.fastf1.core: No result data for this session available on Ergast! (This is expected for recent sessions)
+2026-03-24 22:48:44,390 [WARNING] fastf1.fastf1.core: Failed to load driver list and session results!
+2026-03-24 22:48:44,401 [INFO] fastf1.fastf1.req: No cached data found for session_status_data. Loading data...
+2026-03-24 22:48:44,401 [INFO] fastf1.api: Fetching session status data...
+2026-03-24 22:48:44,898 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:45,071 [WARNING] fastf1.fastf1.core: Failed to load session status data!
+2026-03-24 22:48:45,071 [DEBUG] fastf1.fastf1.core: Traceback for failure in session status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2073, in _load_session_status_data
+    session_status = api.session_status_data(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1360, in session_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:45,072 [INFO] fastf1.fastf1.req: No cached data found for track_status_data. Loading data...
+2026-03-24 22:48:45,072 [INFO] fastf1.api: Fetching track status data...
+2026-03-24 22:48:45,398 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:45,578 [WARNING] fastf1.fastf1.core: Failed to load track status data!
+2026-03-24 22:48:45,578 [DEBUG] fastf1.fastf1.core: Traceback for failure in track status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2042, in _load_track_status_data
+    track_status = api.track_status_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1304, in track_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:45,579 [INFO] fastf1.fastf1.req: No cached data found for _extended_timing_data. Loading data...
+2026-03-24 22:48:45,579 [INFO] fastf1.api: Fetching timing data...
+2026-03-24 22:48:45,861 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:46,083 [WARNING] fastf1.fastf1.core: Failed to load timing data!
+2026-03-24 22:48:46,084 [DEBUG] fastf1.fastf1.core: Traceback for failure in lap timing data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1436, in _load_laps_data
+    = api._extended_timing_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 200, in _extended_timing_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:46,087 [INFO] fastf1.fastf1.req: No cached data found for weather_data. Loading data...
+2026-03-24 22:48:46,088 [INFO] fastf1.api: Fetching weather data...
+2026-03-24 22:48:46,279 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:46,578 [WARNING] fastf1.fastf1.core: Failed to load weather data!
+2026-03-24 22:48:46,578 [DEBUG] fastf1.fastf1.core: Traceback for failure in weather data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2517, in _load_weather_data
+    weather_data = api.weather_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1640, in weather_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:46,582 [INFO] fastf1.fastf1.core: Finished loading data for 0 drivers: []
+2026-03-24 22:48:46,582 [WARNING] data.ingest.fastf1_ingest: Failed to load 2026 3 Q: The data you are trying to access has not been loaded yet. See `Session.load`
+2026-03-24 22:48:46,594 [INFO] fastf1.fastf1.core: Loading data for Japanese Grand Prix - Practice 1 [v3.7.0]
+2026-03-24 22:48:46,594 [INFO] fastf1.fastf1.req: No cached data found for session_info. Loading data...
+2026-03-24 22:48:46,594 [INFO] fastf1.api: Fetching session info data...
+2026-03-24 22:48:46,786 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:47,102 [WARNING] fastf1.fastf1.core: Failed to load session info data!
+2026-03-24 22:48:47,103 [DEBUG] fastf1.fastf1.core: Traceback for failure in session info data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1430, in _load_session_info
+    self._session_info = api.session_info(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1714, in session_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:47,104 [INFO] fastf1.fastf1.req: No cached data found for driver_info. Loading data...
+2026-03-24 22:48:47,104 [INFO] fastf1.api: Fetching driver list...
+2026-03-24 22:48:47,276 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:47,626 [WARNING] fastf1.fastf1.core: Failed to load extended driver information!
+2026-03-24 22:48:47,626 [DEBUG] fastf1.fastf1.core: Exception while loading driver list
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2365, in _drivers_from_f1_api
+    f1di = api.driver_info(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1562, in driver_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:47,634 [WARNING] fastf1.fastf1.core: No result data for this session available on Ergast! (This is expected for recent sessions)
+2026-03-24 22:48:47,634 [WARNING] fastf1.fastf1.core: Failed to load driver list and session results!
+2026-03-24 22:48:47,646 [INFO] fastf1.fastf1.req: No cached data found for session_status_data. Loading data...
+2026-03-24 22:48:47,646 [INFO] fastf1.api: Fetching session status data...
+2026-03-24 22:48:47,778 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:48,128 [WARNING] fastf1.fastf1.core: Failed to load session status data!
+2026-03-24 22:48:48,128 [DEBUG] fastf1.fastf1.core: Traceback for failure in session status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2073, in _load_session_status_data
+    session_status = api.session_status_data(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1360, in session_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:48,129 [INFO] fastf1.fastf1.req: No cached data found for track_status_data. Loading data...
+2026-03-24 22:48:48,129 [INFO] fastf1.api: Fetching track status data...
+2026-03-24 22:48:48,304 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:48,638 [WARNING] fastf1.fastf1.core: Failed to load track status data!
+2026-03-24 22:48:48,638 [DEBUG] fastf1.fastf1.core: Traceback for failure in track status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2042, in _load_track_status_data
+    track_status = api.track_status_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1304, in track_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:48,638 [INFO] fastf1.fastf1.req: No cached data found for _extended_timing_data. Loading data...
+2026-03-24 22:48:48,638 [INFO] fastf1.api: Fetching timing data...
+2026-03-24 22:48:48,776 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:49,078 [WARNING] fastf1.fastf1.core: Failed to load timing data!
+2026-03-24 22:48:49,078 [DEBUG] fastf1.fastf1.core: Traceback for failure in lap timing data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1436, in _load_laps_data
+    = api._extended_timing_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 200, in _extended_timing_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:49,079 [INFO] fastf1.fastf1.req: No cached data found for weather_data. Loading data...
+2026-03-24 22:48:49,079 [INFO] fastf1.api: Fetching weather data...
+2026-03-24 22:48:49,276 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:49,600 [WARNING] fastf1.fastf1.core: Failed to load weather data!
+2026-03-24 22:48:49,601 [DEBUG] fastf1.fastf1.core: Traceback for failure in weather data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2517, in _load_weather_data
+    weather_data = api.weather_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1640, in weather_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:49,608 [INFO] fastf1.fastf1.core: Finished loading data for 0 drivers: []
+2026-03-24 22:48:49,609 [WARNING] data.ingest.fastf1_ingest: Failed to load 2026 3 FP1: The data you are trying to access has not been loaded yet. See `Session.load`
+2026-03-24 22:48:49,642 [INFO] fastf1.fastf1.core: Loading data for Japanese Grand Prix - Practice 2 [v3.7.0]
+2026-03-24 22:48:49,642 [INFO] fastf1.fastf1.req: No cached data found for session_info. Loading data...
+2026-03-24 22:48:49,642 [INFO] fastf1.api: Fetching session info data...
+2026-03-24 22:48:49,789 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:50,117 [WARNING] fastf1.fastf1.core: Failed to load session info data!
+2026-03-24 22:48:50,120 [DEBUG] fastf1.fastf1.core: Traceback for failure in session info data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1430, in _load_session_info
+    self._session_info = api.session_info(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1714, in session_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:50,121 [INFO] fastf1.fastf1.req: No cached data found for driver_info. Loading data...
+2026-03-24 22:48:50,121 [INFO] fastf1.api: Fetching driver list...
+2026-03-24 22:48:50,314 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:50,643 [WARNING] fastf1.fastf1.core: Failed to load extended driver information!
+2026-03-24 22:48:50,643 [DEBUG] fastf1.fastf1.core: Exception while loading driver list
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2365, in _drivers_from_f1_api
+    f1di = api.driver_info(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1562, in driver_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:50,651 [WARNING] fastf1.fastf1.core: No result data for this session available on Ergast! (This is expected for recent sessions)
+2026-03-24 22:48:50,651 [WARNING] fastf1.fastf1.core: Failed to load driver list and session results!
+2026-03-24 22:48:50,658 [INFO] fastf1.fastf1.req: No cached data found for session_status_data. Loading data...
+2026-03-24 22:48:50,658 [INFO] fastf1.api: Fetching session status data...
+2026-03-24 22:48:50,836 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:51,167 [WARNING] fastf1.fastf1.core: Failed to load session status data!
+2026-03-24 22:48:51,167 [DEBUG] fastf1.fastf1.core: Traceback for failure in session status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2073, in _load_session_status_data
+    session_status = api.session_status_data(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1360, in session_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:51,168 [INFO] fastf1.fastf1.req: No cached data found for track_status_data. Loading data...
+2026-03-24 22:48:51,168 [INFO] fastf1.api: Fetching track status data...
+2026-03-24 22:48:51,300 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:51,593 [WARNING] fastf1.fastf1.core: Failed to load track status data!
+2026-03-24 22:48:51,594 [DEBUG] fastf1.fastf1.core: Traceback for failure in track status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2042, in _load_track_status_data
+    track_status = api.track_status_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1304, in track_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:51,594 [INFO] fastf1.fastf1.req: No cached data found for _extended_timing_data. Loading data...
+2026-03-24 22:48:51,594 [INFO] fastf1.api: Fetching timing data...
+2026-03-24 22:48:51,807 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:52,100 [WARNING] fastf1.fastf1.core: Failed to load timing data!
+2026-03-24 22:48:52,101 [DEBUG] fastf1.fastf1.core: Traceback for failure in lap timing data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1436, in _load_laps_data
+    = api._extended_timing_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 200, in _extended_timing_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:52,101 [INFO] fastf1.fastf1.req: No cached data found for weather_data. Loading data...
+2026-03-24 22:48:52,102 [INFO] fastf1.api: Fetching weather data...
+2026-03-24 22:48:52,382 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:48:52,591 [WARNING] fastf1.fastf1.core: Failed to load weather data!
+2026-03-24 22:48:52,592 [DEBUG] fastf1.fastf1.core: Traceback for failure in weather data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2517, in _load_weather_data
+    weather_data = api.weather_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1640, in weather_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:48:52,595 [INFO] fastf1.fastf1.core: Finished loading data for 0 drivers: []
+2026-03-24 22:48:52,596 [WARNING] data.ingest.fastf1_ingest: Failed to load 2026 3 FP2: The data you are trying to access has not been loaded yet. See `Session.load`
+2026-03-24 22:48:52,596 [WARNING] data.ingest.fastf1_ingest: 6 consecutive failures — likely rate limited. Stopping 2026.
+2026-03-24 22:48:52,607 [INFO] data.ingest.fastf1_ingest:   2026: 4557 laps
+2026-03-24 22:48:52,627 [INFO] data.ingest.fastf1_ingest: Total laps: 4557
+2026-03-24 22:48:52,646 [INFO] data.pipeline:   Merged fastf1_laps: kept 0 historic + 4557 new = 4557 total
+2026-03-24 22:48:52,646 [INFO] data.pipeline:   laps: 4,557 rows
+2026-03-24 22:48:52,646 [INFO] data.pipeline: 
+Ingestion complete.
+2026-03-24 22:48:53,851 [INFO] data.pipeline: ============================================================
+2026-03-24 22:48:53,851 [INFO] data.pipeline: STEP 2: Feature Engineering
+2026-03-24 22:48:53,851 [INFO] data.pipeline: ============================================================
+2026-03-24 22:48:53,904 [INFO] data.features.engineer: Computed FastF1 stats for 38 driver-race entries
+2026-03-24 22:48:53,905 [INFO] data.features.engineer: FastF1 data available for 38 driver-race entries
+2026-03-24 22:48:54,100 [INFO] data.features.engineer: Built qualifying times index for 454 races
+2026-03-24 22:48:54,109 [INFO] data.features.engineer: Built sprint index for 25 sprint races
+2026-03-24 22:48:54,111 [INFO] data.features.engineer: Built weather index for 2 races
+2026-03-24 22:48:54,132 [INFO] data.features.engineer: Computed track status stats for 43 driver-race entries
+2026-03-24 22:48:54,154 [INFO] data.features.engineer: Computed practice pace for 44 driver-race entries
+2026-03-24 22:48:54,367 [INFO] data.features.engineer: Computed cumulative standings for 430 race rounds
+2026-03-24 22:48:54,400 [INFO] data.features.engineer: Computed overtaking rates for 38 circuits
+2026-03-24 22:48:54,438 [INFO] data.features.engineer: Computed circuit DNA for 38 circuits
+2026-03-24 22:48:54,445 [INFO] data.features.engineer: Computed pit stop stats for 19 team-race entries
+2026-03-24 22:48:54,453 [INFO] data.features.engineer: Computed rain probability for 38 circuits (0 with historical rain)
+2026-03-24 22:48:54,467 [INFO] data.ingest.weather: Loaded weather forecasts for 175 races across 9 seasons
+2026-03-24 22:48:55,969 [INFO] data.features.elo: Regulation reset applied for 2005: driver retain=0.88, constructor retain=0.70
+2026-03-24 22:48:56,676 [INFO] data.features.elo: Regulation reset applied for 2006: driver retain=0.80, constructor retain=0.50
+2026-03-24 22:48:58,789 [INFO] data.features.elo: Regulation reset applied for 2009: driver retain=0.72, constructor retain=0.30
+2026-03-24 22:49:00,360 [INFO] data.features.elo: Regulation reset applied for 2011: driver retain=0.88, constructor retain=0.70
+2026-03-24 22:49:02,984 [INFO] data.features.elo: Regulation reset applied for 2014: driver retain=0.68, constructor retain=0.20
+2026-03-24 22:49:05,341 [INFO] data.features.elo: Regulation reset applied for 2017: driver retain=0.80, constructor retain=0.50
+2026-03-24 22:49:07,015 [INFO] data.features.elo: Regulation reset applied for 2019: driver retain=0.88, constructor retain=0.70
+2026-03-24 22:49:09,472 [INFO] data.features.elo: Regulation reset applied for 2022: driver retain=0.66, constructor retain=0.15
+2026-03-24 22:49:13,342 [INFO] data.features.elo: Regulation reset applied for 2026: driver retain=0.68, constructor retain=0.20
+2026-03-24 22:49:13,607 [INFO] data.features.engineer: Feature matrix: 9489 rows × 171 columns (147 base + 24 FastF1)
+2026-03-24 22:49:13,676 [INFO] data.pipeline: Feature matrix saved: 9,489 rows × 171 columns
+2026-03-24 22:49:14,337 [INFO] data.pipeline: ============================================================
+2026-03-24 22:49:14,337 [INFO] data.pipeline: STEP 3: Model Training
+2026-03-24 22:49:14,337 [INFO] data.pipeline: ============================================================
+2026-03-24 22:49:14,360 [INFO] data.features.engineer: Training data: 8966 samples, 163 features
+2026-03-24 22:49:14,363 [INFO] data.features.engineer: Training data: 523 samples, 163 features
+2026-03-24 22:49:14,407 [INFO] data.models.plackett_luce: Fitting Plackett-Luce on 428 races, 113 drivers, 35 constructors
+2026-03-24 22:49:17,155 [INFO] data.models.plackett_luce: PL fit complete (NLL=2004.04). Top drivers: max_verstappen=1.37, norris=1.05, piastri=1.01, bearman=0.58, merhi=0.58
+2026-03-24 22:49:17,186 [INFO] data.models.predictor: Injected 3 Plackett-Luce features into feature matrix
+2026-03-24 22:49:17,190 [INFO] data.models.predictor: Injected 3 Plackett-Luce features into feature matrix
+2026-03-24 22:49:17,246 [INFO] data.models.predictor: Training stacking position regression model...
+2026-03-24 22:49:17,308 [INFO] data.models.predictor: Using XGBRegressor
+2026-03-24 22:49:17,309 [INFO] data.models.predictor: Using XGBRegressor
+2026-03-24 22:49:23,311 [INFO] data.models.predictor: Position MAE (CV, single model baseline): 3.49 +/- 0.31
+2026-03-24 22:49:40,226 [INFO] data.models.predictor: Stacking ensemble fitted (GB + ExtraTrees → Ridge)
+2026-03-24 22:49:40,227 [INFO] data.models.predictor: Training calibrated podium classifier...
+2026-03-24 22:49:40,230 [INFO] data.models.predictor: Using XGBClassifier
+2026-03-24 22:49:44,338 [INFO] data.models.predictor: Podium accuracy (CV): 0.905 +/- 0.011
+2026-03-24 22:49:44,340 [INFO] data.models.predictor: Using Venn-ABERS calibration (theoretically guaranteed)
+2026-03-24 22:49:45,211 [INFO] data.models.predictor: Training calibrated winner classifier...
+2026-03-24 22:49:45,212 [INFO] data.models.predictor: Using XGBClassifier
+2026-03-24 22:49:45,212 [INFO] data.models.predictor: Using Venn-ABERS calibration (theoretically guaranteed)
+2026-03-24 22:49:45,910 [INFO] data.models.predictor: Training calibrated points classifier...
+2026-03-24 22:49:45,911 [INFO] data.models.predictor: Using XGBClassifier
+2026-03-24 22:49:45,911 [INFO] data.models.predictor: Using Venn-ABERS calibration (theoretically guaranteed)
+2026-03-24 22:49:46,434 [INFO] data.models.predictor: Training calibrated DNF classifier...
+2026-03-24 22:49:46,436 [INFO] data.models.predictor: Using XGBClassifier
+2026-03-24 22:49:48,842 [INFO] data.models.predictor: DNF accuracy (CV): 0.718 +/- 0.006
+2026-03-24 22:49:48,842 [INFO] data.models.predictor: Using Venn-ABERS calibration (theoretically guaranteed)
+2026-03-24 22:50:45,685 [INFO] data.models.predictor: Top 10 features:
+2026-03-24 22:50:45,686 [INFO] data.models.predictor:   expected_grid_delta: 0.0942
+2026-03-24 22:50:45,686 [INFO] data.models.predictor:   constructor_circuit_races: 0.0876
+2026-03-24 22:50:45,686 [INFO] data.models.predictor:   grid_expected_finish: 0.0788
+2026-03-24 22:50:45,686 [INFO] data.models.predictor:   quali_position: 0.0765
+2026-03-24 22:50:45,686 [INFO] data.models.predictor:   constructor_circuit_trend: 0.0519
+2026-03-24 22:50:45,686 [INFO] data.models.predictor:   constructor_pace_jump_magnitude: 0.0504
+2026-03-24 22:50:45,686 [INFO] data.models.predictor:   constructor_pace_vs_prev_similar: 0.0495
+2026-03-24 22:50:45,686 [INFO] data.models.predictor:   constructor_circuit_avg: 0.0455
+2026-03-24 22:50:45,686 [INFO] data.models.predictor:   constructor_season_trend: 0.0295
+2026-03-24 22:50:45,687 [INFO] data.models.predictor:   pl_combined_strength: 0.0266
+2026-03-24 22:50:46,607 [INFO] data.models.predictor: Evaluation results:
+2026-03-24 22:50:46,607 [INFO] data.models.predictor:   position_mae: 3.1304
+2026-03-24 22:50:46,607 [INFO] data.models.predictor:   podium_accuracy: 0.9006
+2026-03-24 22:50:46,607 [INFO] data.models.predictor:   winner_accuracy: 0.9541
+2026-03-24 22:50:46,607 [INFO] data.models.predictor:   dnf_accuracy: 0.7151
+2026-03-24 22:50:46,607 [INFO] data.models.predictor:   dnf_recall: 0.4693
+2026-03-24 22:50:46,755 [INFO] data.models.predictor: Models saved to /Users/julien.l/Documents/GitHub/formula-projections/data/cache/models
+2026-03-24 22:50:46,755 [INFO] data.pipeline: 
+Training complete.
+2026-03-24 22:50:46,755 [INFO] data.pipeline: Position MAE: 3.13040299173909
+2026-03-24 22:50:46,755 [INFO] data.pipeline: Podium accuracy: 0.9005736137667304
+2026-03-24 22:50:46,755 [INFO] data.pipeline: Winner accuracy: 0.9541108986615678
+2026-03-24 22:50:46,800 [INFO] fastf1.fastf1.core: Loading data for Japanese Grand Prix - Practice 1 [v3.7.0]
+2026-03-24 22:50:46,800 [INFO] fastf1.fastf1.req: No cached data found for session_info. Loading data...
+2026-03-24 22:50:46,800 [INFO] fastf1.api: Fetching session info data...
+2026-03-24 22:50:47,083 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:47,333 [WARNING] fastf1.fastf1.core: Failed to load session info data!
+2026-03-24 22:50:47,333 [DEBUG] fastf1.fastf1.core: Traceback for failure in session info data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1430, in _load_session_info
+    self._session_info = api.session_info(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1714, in session_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:47,338 [INFO] fastf1.fastf1.req: No cached data found for driver_info. Loading data...
+2026-03-24 22:50:47,338 [INFO] fastf1.api: Fetching driver list...
+2026-03-24 22:50:47,492 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:47,810 [WARNING] fastf1.fastf1.core: Failed to load extended driver information!
+2026-03-24 22:50:47,810 [DEBUG] fastf1.fastf1.core: Exception while loading driver list
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2365, in _drivers_from_f1_api
+    f1di = api.driver_info(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1562, in driver_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:47,872 [WARNING] fastf1.fastf1.core: No result data for this session available on Ergast! (This is expected for recent sessions)
+2026-03-24 22:50:47,873 [WARNING] fastf1.fastf1.core: Failed to load driver list and session results!
+2026-03-24 22:50:47,878 [INFO] fastf1.fastf1.req: No cached data found for session_status_data. Loading data...
+2026-03-24 22:50:47,878 [INFO] fastf1.api: Fetching session status data...
+2026-03-24 22:50:47,933 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:48,315 [WARNING] fastf1.fastf1.core: Failed to load session status data!
+2026-03-24 22:50:48,315 [DEBUG] fastf1.fastf1.core: Traceback for failure in session status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2073, in _load_session_status_data
+    session_status = api.session_status_data(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1360, in session_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:48,316 [INFO] fastf1.fastf1.req: No cached data found for track_status_data. Loading data...
+2026-03-24 22:50:48,316 [INFO] fastf1.api: Fetching track status data...
+2026-03-24 22:50:48,507 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:48,802 [WARNING] fastf1.fastf1.core: Failed to load track status data!
+2026-03-24 22:50:48,803 [DEBUG] fastf1.fastf1.core: Traceback for failure in track status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2042, in _load_track_status_data
+    track_status = api.track_status_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1304, in track_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:48,803 [INFO] fastf1.fastf1.req: No cached data found for _extended_timing_data. Loading data...
+2026-03-24 22:50:48,803 [INFO] fastf1.api: Fetching timing data...
+2026-03-24 22:50:48,947 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:49,310 [WARNING] fastf1.fastf1.core: Failed to load timing data!
+2026-03-24 22:50:49,310 [DEBUG] fastf1.fastf1.core: Traceback for failure in lap timing data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1436, in _load_laps_data
+    = api._extended_timing_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 200, in _extended_timing_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:49,311 [INFO] fastf1.fastf1.req: No cached data found for weather_data. Loading data...
+2026-03-24 22:50:49,311 [INFO] fastf1.api: Fetching weather data...
+2026-03-24 22:50:49,505 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:49,808 [WARNING] fastf1.fastf1.core: Failed to load weather data!
+2026-03-24 22:50:49,808 [DEBUG] fastf1.fastf1.core: Traceback for failure in weather data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2517, in _load_weather_data
+    weather_data = api.weather_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1640, in weather_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:49,812 [INFO] fastf1.fastf1.core: Finished loading data for 0 drivers: []
+2026-03-24 22:50:49,812 [WARNING] data.ingest.fastf1_ingest: Failed to load 2026 3 FP1: The data you are trying to access has not been loaded yet. See `Session.load`
+2026-03-24 22:50:49,830 [INFO] fastf1.fastf1.core: Loading data for Japanese Grand Prix - Practice 2 [v3.7.0]
+2026-03-24 22:50:49,830 [INFO] fastf1.fastf1.req: No cached data found for session_info. Loading data...
+2026-03-24 22:50:49,830 [INFO] fastf1.api: Fetching session info data...
+2026-03-24 22:50:50,009 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:50,297 [WARNING] fastf1.fastf1.core: Failed to load session info data!
+2026-03-24 22:50:50,298 [DEBUG] fastf1.fastf1.core: Traceback for failure in session info data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1430, in _load_session_info
+    self._session_info = api.session_info(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1714, in session_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:50,299 [INFO] fastf1.fastf1.req: No cached data found for driver_info. Loading data...
+2026-03-24 22:50:50,299 [INFO] fastf1.api: Fetching driver list...
+2026-03-24 22:50:50,511 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:50,808 [WARNING] fastf1.fastf1.core: Failed to load extended driver information!
+2026-03-24 22:50:50,808 [DEBUG] fastf1.fastf1.core: Exception while loading driver list
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2365, in _drivers_from_f1_api
+    f1di = api.driver_info(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1562, in driver_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:50,818 [WARNING] fastf1.fastf1.core: No result data for this session available on Ergast! (This is expected for recent sessions)
+2026-03-24 22:50:50,818 [WARNING] fastf1.fastf1.core: Failed to load driver list and session results!
+2026-03-24 22:50:50,830 [INFO] fastf1.fastf1.req: No cached data found for session_status_data. Loading data...
+2026-03-24 22:50:50,830 [INFO] fastf1.api: Fetching session status data...
+2026-03-24 22:50:51,008 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:51,298 [WARNING] fastf1.fastf1.core: Failed to load session status data!
+2026-03-24 22:50:51,298 [DEBUG] fastf1.fastf1.core: Traceback for failure in session status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2073, in _load_session_status_data
+    session_status = api.session_status_data(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1360, in session_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:51,299 [INFO] fastf1.fastf1.req: No cached data found for track_status_data. Loading data...
+2026-03-24 22:50:51,301 [INFO] fastf1.api: Fetching track status data...
+2026-03-24 22:50:51,515 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:51,794 [WARNING] fastf1.fastf1.core: Failed to load track status data!
+2026-03-24 22:50:51,794 [DEBUG] fastf1.fastf1.core: Traceback for failure in track status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2042, in _load_track_status_data
+    track_status = api.track_status_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1304, in track_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:51,794 [INFO] fastf1.fastf1.req: No cached data found for _extended_timing_data. Loading data...
+2026-03-24 22:50:51,795 [INFO] fastf1.api: Fetching timing data...
+2026-03-24 22:50:52,019 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:52,301 [WARNING] fastf1.fastf1.core: Failed to load timing data!
+2026-03-24 22:50:52,302 [DEBUG] fastf1.fastf1.core: Traceback for failure in lap timing data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1436, in _load_laps_data
+    = api._extended_timing_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 200, in _extended_timing_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:52,302 [INFO] fastf1.fastf1.req: No cached data found for weather_data. Loading data...
+2026-03-24 22:50:52,302 [INFO] fastf1.api: Fetching weather data...
+2026-03-24 22:50:52,512 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:52,797 [WARNING] fastf1.fastf1.core: Failed to load weather data!
+2026-03-24 22:50:52,797 [DEBUG] fastf1.fastf1.core: Traceback for failure in weather data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2517, in _load_weather_data
+    weather_data = api.weather_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1640, in weather_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:52,803 [INFO] fastf1.fastf1.core: Finished loading data for 0 drivers: []
+2026-03-24 22:50:52,803 [WARNING] data.ingest.fastf1_ingest: Failed to load 2026 3 FP2: The data you are trying to access has not been loaded yet. See `Session.load`
+2026-03-24 22:50:52,826 [INFO] fastf1.fastf1.core: Loading data for Japanese Grand Prix - Practice 3 [v3.7.0]
+2026-03-24 22:50:52,826 [INFO] fastf1.fastf1.req: No cached data found for session_info. Loading data...
+2026-03-24 22:50:52,826 [INFO] fastf1.api: Fetching session info data...
+2026-03-24 22:50:53,039 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:53,303 [WARNING] fastf1.fastf1.core: Failed to load session info data!
+2026-03-24 22:50:53,304 [DEBUG] fastf1.fastf1.core: Traceback for failure in session info data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1430, in _load_session_info
+    self._session_info = api.session_info(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1714, in session_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:53,304 [INFO] fastf1.fastf1.req: No cached data found for driver_info. Loading data...
+2026-03-24 22:50:53,305 [INFO] fastf1.api: Fetching driver list...
+2026-03-24 22:50:53,497 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:53,799 [WARNING] fastf1.fastf1.core: Failed to load extended driver information!
+2026-03-24 22:50:53,799 [DEBUG] fastf1.fastf1.core: Exception while loading driver list
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2365, in _drivers_from_f1_api
+    f1di = api.driver_info(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1562, in driver_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:53,804 [WARNING] fastf1.fastf1.core: No result data for this session available on Ergast! (This is expected for recent sessions)
+2026-03-24 22:50:53,804 [WARNING] fastf1.fastf1.core: Failed to load driver list and session results!
+2026-03-24 22:50:53,810 [INFO] fastf1.fastf1.req: No cached data found for session_status_data. Loading data...
+2026-03-24 22:50:53,810 [INFO] fastf1.api: Fetching session status data...
+2026-03-24 22:50:54,005 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:54,309 [WARNING] fastf1.fastf1.core: Failed to load session status data!
+2026-03-24 22:50:54,310 [DEBUG] fastf1.fastf1.core: Traceback for failure in session status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2073, in _load_session_status_data
+    session_status = api.session_status_data(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1360, in session_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:54,310 [INFO] fastf1.fastf1.req: No cached data found for track_status_data. Loading data...
+2026-03-24 22:50:54,311 [INFO] fastf1.api: Fetching track status data...
+2026-03-24 22:50:54,545 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:54,802 [WARNING] fastf1.fastf1.core: Failed to load track status data!
+2026-03-24 22:50:54,802 [DEBUG] fastf1.fastf1.core: Traceback for failure in track status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2042, in _load_track_status_data
+    track_status = api.track_status_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1304, in track_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:54,803 [INFO] fastf1.fastf1.req: No cached data found for _extended_timing_data. Loading data...
+2026-03-24 22:50:54,803 [INFO] fastf1.api: Fetching timing data...
+2026-03-24 22:50:55,011 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:55,303 [WARNING] fastf1.fastf1.core: Failed to load timing data!
+2026-03-24 22:50:55,304 [DEBUG] fastf1.fastf1.core: Traceback for failure in lap timing data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1436, in _load_laps_data
+    = api._extended_timing_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 200, in _extended_timing_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:55,304 [INFO] fastf1.fastf1.req: No cached data found for weather_data. Loading data...
+2026-03-24 22:50:55,304 [INFO] fastf1.api: Fetching weather data...
+2026-03-24 22:50:55,505 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:55,796 [WARNING] fastf1.fastf1.core: Failed to load weather data!
+2026-03-24 22:50:55,796 [DEBUG] fastf1.fastf1.core: Traceback for failure in weather data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2517, in _load_weather_data
+    weather_data = api.weather_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1640, in weather_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:55,800 [INFO] fastf1.fastf1.core: Finished loading data for 0 drivers: []
+2026-03-24 22:50:55,800 [WARNING] data.ingest.fastf1_ingest: Failed to load 2026 3 FP3: The data you are trying to access has not been loaded yet. See `Session.load`
+2026-03-24 22:50:55,821 [WARNING] data.ingest.fastf1_ingest: Failed to load 2026 3 SQ: Session type 'SQ' does not exist for this event
+2026-03-24 22:50:55,828 [WARNING] data.ingest.fastf1_ingest: Failed to load 2026 3 S: Session type 'S' does not exist for this event
+2026-03-24 22:50:55,836 [INFO] fastf1.fastf1.core: Loading data for Japanese Grand Prix - Qualifying [v3.7.0]
+2026-03-24 22:50:55,836 [INFO] fastf1.fastf1.req: No cached data found for session_info. Loading data...
+2026-03-24 22:50:55,836 [INFO] fastf1.api: Fetching session info data...
+2026-03-24 22:50:56,017 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:56,318 [WARNING] fastf1.fastf1.core: Failed to load session info data!
+2026-03-24 22:50:56,319 [DEBUG] fastf1.fastf1.core: Traceback for failure in session info data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1430, in _load_session_info
+    self._session_info = api.session_info(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1714, in session_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:56,319 [INFO] fastf1.fastf1.req: No cached data found for driver_info. Loading data...
+2026-03-24 22:50:56,319 [INFO] fastf1.api: Fetching driver list...
+2026-03-24 22:50:56,509 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:56,794 [WARNING] fastf1.fastf1.core: Failed to load extended driver information!
+2026-03-24 22:50:56,794 [DEBUG] fastf1.fastf1.core: Exception while loading driver list
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2365, in _drivers_from_f1_api
+    f1di = api.driver_info(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1562, in driver_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:56,803 [WARNING] fastf1.fastf1.core: No result data for this session available on Ergast! (This is expected for recent sessions)
+2026-03-24 22:50:56,803 [WARNING] fastf1.fastf1.core: Failed to load driver list and session results!
+2026-03-24 22:50:56,812 [INFO] fastf1.fastf1.req: No cached data found for session_status_data. Loading data...
+2026-03-24 22:50:56,812 [INFO] fastf1.api: Fetching session status data...
+2026-03-24 22:50:57,006 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:57,305 [WARNING] fastf1.fastf1.core: Failed to load session status data!
+2026-03-24 22:50:57,306 [DEBUG] fastf1.fastf1.core: Traceback for failure in session status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2073, in _load_session_status_data
+    session_status = api.session_status_data(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1360, in session_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:57,307 [INFO] fastf1.fastf1.req: No cached data found for track_status_data. Loading data...
+2026-03-24 22:50:57,308 [INFO] fastf1.api: Fetching track status data...
+2026-03-24 22:50:57,515 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:57,787 [WARNING] fastf1.fastf1.core: Failed to load track status data!
+2026-03-24 22:50:57,789 [DEBUG] fastf1.fastf1.core: Traceback for failure in track status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2042, in _load_track_status_data
+    track_status = api.track_status_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1304, in track_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:57,790 [INFO] fastf1.fastf1.req: No cached data found for _extended_timing_data. Loading data...
+2026-03-24 22:50:57,790 [INFO] fastf1.api: Fetching timing data...
+2026-03-24 22:50:58,004 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:58,310 [WARNING] fastf1.fastf1.core: Failed to load timing data!
+2026-03-24 22:50:58,313 [DEBUG] fastf1.fastf1.core: Traceback for failure in lap timing data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1436, in _load_laps_data
+    = api._extended_timing_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 200, in _extended_timing_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:58,314 [INFO] fastf1.fastf1.req: No cached data found for weather_data. Loading data...
+2026-03-24 22:50:58,315 [INFO] fastf1.api: Fetching weather data...
+2026-03-24 22:50:58,514 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:50:58,798 [WARNING] fastf1.fastf1.core: Failed to load weather data!
+2026-03-24 22:50:58,798 [DEBUG] fastf1.fastf1.core: Traceback for failure in weather data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2517, in _load_weather_data
+    weather_data = api.weather_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1640, in weather_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:50:58,801 [INFO] fastf1.fastf1.core: Finished loading data for 0 drivers: []
+2026-03-24 22:50:58,801 [WARNING] data.ingest.fastf1_ingest: Failed to load 2026 3 Q: The data you are trying to access has not been loaded yet. See `Session.load`
+2026-03-24 22:50:58,801 [WARNING] data.predict_weekend: No session data found for 2026 Round 3
+2026-03-24 22:50:59,365 [WARNING] data.predict_weekend: Odds auto-fetch failed (non-fatal): 404 Client Error: Not Found for url: https://api.the-odds-api.com/v4/sports/motorsport_formula_one/odds?apiKey=f4c14b63500a24df2d3e5d7ef92d4ac8&regions=eu&markets=h2h&oddsFormat=decimal
+2026-03-24 22:50:59,399 [INFO] data.predict_weekend: Circuit: suzuka (Japanese Grand Prix)
+2026-03-24 22:50:59,415 [INFO] data.predict_weekend: No qualifying data — estimating grid from latest race lineup
+2026-03-24 22:50:59,449 [INFO] data.predict_weekend: Injected 22 placeholder rows for 2026 Round 3
+2026-03-24 22:50:59,450 [INFO] data.pipeline: ============================================================
+2026-03-24 22:50:59,450 [INFO] data.pipeline: STEP 2: Feature Engineering
+2026-03-24 22:50:59,450 [INFO] data.pipeline: ============================================================
+2026-03-24 22:50:59,505 [INFO] data.features.engineer: Computed FastF1 stats for 38 driver-race entries
+2026-03-24 22:50:59,505 [INFO] data.features.engineer: FastF1 data available for 38 driver-race entries
+2026-03-24 22:50:59,719 [INFO] data.features.engineer: Built qualifying times index for 454 races
+2026-03-24 22:50:59,729 [INFO] data.features.engineer: Built sprint index for 25 sprint races
+2026-03-24 22:50:59,731 [INFO] data.features.engineer: Built weather index for 2 races
+2026-03-24 22:50:59,744 [INFO] data.features.engineer: Computed track status stats for 43 driver-race entries
+2026-03-24 22:50:59,765 [INFO] data.features.engineer: Computed practice pace for 44 driver-race entries
+2026-03-24 22:50:59,997 [INFO] data.features.engineer: Computed cumulative standings for 431 race rounds
+2026-03-24 22:51:00,084 [INFO] data.features.engineer: Computed overtaking rates for 38 circuits
+2026-03-24 22:51:00,126 [INFO] data.features.engineer: Computed circuit DNA for 38 circuits
+2026-03-24 22:51:00,133 [INFO] data.features.engineer: Computed pit stop stats for 19 team-race entries
+2026-03-24 22:51:00,143 [INFO] data.features.engineer: Computed rain probability for 38 circuits (0 with historical rain)
+2026-03-24 22:51:00,167 [INFO] data.ingest.weather: Loaded weather forecasts for 175 races across 9 seasons
+2026-03-24 22:51:01,510 [INFO] data.features.elo: Regulation reset applied for 2005: driver retain=0.88, constructor retain=0.70
+2026-03-24 22:51:02,165 [INFO] data.features.elo: Regulation reset applied for 2006: driver retain=0.80, constructor retain=0.50
+2026-03-24 22:51:04,272 [INFO] data.features.elo: Regulation reset applied for 2009: driver retain=0.72, constructor retain=0.30
+2026-03-24 22:51:05,718 [INFO] data.features.elo: Regulation reset applied for 2011: driver retain=0.88, constructor retain=0.70
+2026-03-24 22:51:08,243 [INFO] data.features.elo: Regulation reset applied for 2014: driver retain=0.68, constructor retain=0.20
+2026-03-24 22:51:10,715 [INFO] data.features.elo: Regulation reset applied for 2017: driver retain=0.80, constructor retain=0.50
+2026-03-24 22:51:12,315 [INFO] data.features.elo: Regulation reset applied for 2019: driver retain=0.88, constructor retain=0.70
+2026-03-24 22:51:14,680 [INFO] data.features.elo: Regulation reset applied for 2022: driver retain=0.66, constructor retain=0.15
+2026-03-24 22:51:18,340 [INFO] data.features.elo: Regulation reset applied for 2026: driver retain=0.68, constructor retain=0.20
+2026-03-24 22:51:18,635 [INFO] data.features.engineer: Feature matrix: 9511 rows × 171 columns (147 base + 24 FastF1)
+2026-03-24 22:51:18,701 [INFO] data.pipeline: Feature matrix saved: 9,511 rows × 171 columns
+2026-03-24 22:51:18,734 [INFO] data.predict_weekend: Cleaned 22 placeholder rows
+2026-03-24 22:51:18,750 [INFO] fastf1.fastf1.core: Loading data for Japanese Grand Prix - Race [v3.7.0]
+2026-03-24 22:51:18,751 [INFO] fastf1.fastf1.req: No cached data found for session_info. Loading data...
+2026-03-24 22:51:18,751 [INFO] fastf1.api: Fetching session info data...
+2026-03-24 22:51:18,923 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:19,232 [WARNING] fastf1.fastf1.core: Failed to load session info data!
+2026-03-24 22:51:19,232 [DEBUG] fastf1.fastf1.core: Traceback for failure in session info data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1430, in _load_session_info
+    self._session_info = api.session_info(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1714, in session_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:19,232 [INFO] fastf1.fastf1.req: No cached data found for driver_info. Loading data...
+2026-03-24 22:51:19,232 [INFO] fastf1.api: Fetching driver list...
+2026-03-24 22:51:19,391 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:19,737 [WARNING] fastf1.fastf1.core: Failed to load extended driver information!
+2026-03-24 22:51:19,738 [DEBUG] fastf1.fastf1.core: Exception while loading driver list
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2365, in _drivers_from_f1_api
+    f1di = api.driver_info(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1562, in driver_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:19,749 [WARNING] fastf1.fastf1.core: No result data for this session available on Ergast! (This is expected for recent sessions)
+2026-03-24 22:51:19,749 [WARNING] fastf1.fastf1.core: Failed to load driver list and session results!
+2026-03-24 22:51:19,762 [INFO] fastf1.fastf1.req: No cached data found for session_status_data. Loading data...
+2026-03-24 22:51:19,762 [INFO] fastf1.api: Fetching session status data...
+2026-03-24 22:51:19,902 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:20,185 [WARNING] fastf1.fastf1.core: Failed to load session status data!
+2026-03-24 22:51:20,185 [DEBUG] fastf1.fastf1.core: Traceback for failure in session status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2073, in _load_session_status_data
+    session_status = api.session_status_data(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1360, in session_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:20,185 [INFO] fastf1.fastf1.req: No cached data found for lap_count. Loading data...
+2026-03-24 22:51:20,185 [INFO] fastf1.api: Fetching lap count data...
+2026-03-24 22:51:20,402 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:20,694 [WARNING] fastf1.fastf1.core: Failed to load total lap count!
+2026-03-24 22:51:20,695 [DEBUG] fastf1.fastf1.core: Traceback for failure in total lap count
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2055, in _load_total_lap_count
+    lap_count = api.lap_count(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1503, in lap_count
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:20,695 [INFO] fastf1.fastf1.req: No cached data found for track_status_data. Loading data...
+2026-03-24 22:51:20,696 [INFO] fastf1.api: Fetching track status data...
+2026-03-24 22:51:20,894 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:21,189 [WARNING] fastf1.fastf1.core: Failed to load track status data!
+2026-03-24 22:51:21,190 [DEBUG] fastf1.fastf1.core: Traceback for failure in track status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2042, in _load_track_status_data
+    track_status = api.track_status_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1304, in track_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:21,190 [INFO] fastf1.fastf1.req: No cached data found for _extended_timing_data. Loading data...
+2026-03-24 22:51:21,190 [INFO] fastf1.api: Fetching timing data...
+2026-03-24 22:51:21,400 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:21,720 [WARNING] fastf1.fastf1.core: Failed to load timing data!
+2026-03-24 22:51:21,721 [DEBUG] fastf1.fastf1.core: Traceback for failure in lap timing data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1436, in _load_laps_data
+    = api._extended_timing_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 200, in _extended_timing_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:21,733 [WARNING] fastf1.fastf1.core: Cannot load lap times for first lap from Ergast. Timing data is not available for this session.
+2026-03-24 22:51:21,733 [INFO] fastf1.fastf1.req: No cached data found for weather_data. Loading data...
+2026-03-24 22:51:21,733 [INFO] fastf1.api: Fetching weather data...
+2026-03-24 22:51:21,902 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:22,184 [WARNING] fastf1.fastf1.core: Failed to load weather data!
+2026-03-24 22:51:22,185 [DEBUG] fastf1.fastf1.core: Traceback for failure in weather data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2517, in _load_weather_data
+    weather_data = api.weather_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1640, in weather_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:22,189 [INFO] fastf1.fastf1.core: Finished loading data for 0 drivers: []
+2026-03-24 22:51:22,331 [INFO] data.models.predictor: Models loaded from /Users/julien.l/Documents/GitHub/formula-projections/data/cache/models
+2026-03-24 22:51:22,502 [INFO] fastf1.fastf1.core: Loading data for Japanese Grand Prix - Qualifying [v3.7.0]
+2026-03-24 22:51:22,502 [INFO] fastf1.fastf1.req: No cached data found for session_info. Loading data...
+2026-03-24 22:51:22,502 [INFO] fastf1.api: Fetching session info data...
+2026-03-24 22:51:22,671 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:22,982 [WARNING] fastf1.fastf1.core: Failed to load session info data!
+2026-03-24 22:51:22,982 [DEBUG] fastf1.fastf1.core: Traceback for failure in session info data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1430, in _load_session_info
+    self._session_info = api.session_info(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1714, in session_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:22,982 [INFO] fastf1.fastf1.req: No cached data found for driver_info. Loading data...
+2026-03-24 22:51:22,982 [INFO] fastf1.api: Fetching driver list...
+2026-03-24 22:51:23,128 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:23,457 [WARNING] fastf1.fastf1.core: Failed to load extended driver information!
+2026-03-24 22:51:23,458 [DEBUG] fastf1.fastf1.core: Exception while loading driver list
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2365, in _drivers_from_f1_api
+    f1di = api.driver_info(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1562, in driver_info
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:23,466 [WARNING] fastf1.fastf1.core: No result data for this session available on Ergast! (This is expected for recent sessions)
+2026-03-24 22:51:23,467 [WARNING] fastf1.fastf1.core: Failed to load driver list and session results!
+2026-03-24 22:51:23,491 [INFO] fastf1.fastf1.req: No cached data found for session_status_data. Loading data...
+2026-03-24 22:51:23,492 [INFO] fastf1.api: Fetching session status data...
+2026-03-24 22:51:23,628 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:23,932 [WARNING] fastf1.fastf1.core: Failed to load session status data!
+2026-03-24 22:51:23,933 [DEBUG] fastf1.fastf1.core: Traceback for failure in session status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2073, in _load_session_status_data
+    session_status = api.session_status_data(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1360, in session_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:23,933 [INFO] fastf1.fastf1.req: No cached data found for track_status_data. Loading data...
+2026-03-24 22:51:23,933 [INFO] fastf1.api: Fetching track status data...
+2026-03-24 22:51:24,136 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:24,447 [WARNING] fastf1.fastf1.core: Failed to load track status data!
+2026-03-24 22:51:24,447 [DEBUG] fastf1.fastf1.core: Traceback for failure in track status data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2042, in _load_track_status_data
+    track_status = api.track_status_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1304, in track_status_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:24,447 [INFO] fastf1.fastf1.req: No cached data found for _extended_timing_data. Loading data...
+2026-03-24 22:51:24,447 [INFO] fastf1.api: Fetching timing data...
+2026-03-24 22:51:24,638 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:24,937 [WARNING] fastf1.fastf1.core: Failed to load timing data!
+2026-03-24 22:51:24,938 [DEBUG] fastf1.fastf1.core: Traceback for failure in lap timing data
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 1436, in _load_laps_data
+    = api._extended_timing_data(self.api_path, livedata=livedata)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 200, in _extended_timing_data
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:24,940 [INFO] fastf1.fastf1.req: No cached data found for race_control_messages. Loading data...
+2026-03-24 22:51:24,940 [INFO] fastf1.api: Fetching race control messages...
+2026-03-24 22:51:25,130 [DEBUG] fastf1.api: Falling back to livetiming mirror (https://livetiming-mirror.fastf1.dev)
+2026-03-24 22:51:25,428 [WARNING] fastf1.fastf1.core: Failed to load race control messages!
+2026-03-24 22:51:25,428 [DEBUG] fastf1.fastf1.core: Traceback for failure in race control messages
+Traceback (most recent call last):
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/logger.py", line 111, in __wrapped
+    return func(*args, **kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/core.py", line 2524, in _load_race_control_messages
+    race_control_messages = api.race_control_messages(self.api_path,
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/req.py", line 457, in _cached_api_request
+    data = func(api_path, **func_kwargs)
+  File "/Users/julien.l/Documents/GitHub/formula-projections/venv/lib/python3.9/site-packages/fastf1/_api.py", line 1431, in race_control_messages
+    raise SessionNotAvailableError(
+fastf1._api.SessionNotAvailableError: No data for this session! If this session only finished recently, please try again in a few minutes.
+2026-03-24 22:51:25,433 [INFO] fastf1.fastf1.core: Finished loading data for 0 drivers: []
