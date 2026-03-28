@@ -1,0 +1,80 @@
+name: Update Predictions
+
+on:
+  # Auto-run during race weekends (Friday-Sunday) every 30 minutes
+  schedule:
+    - cron: '*/30 * * * 5'   # Every 30 min on Fridays
+    - cron: '*/30 * * * 6'   # Every 30 min on Saturdays
+    - cron: '*/30 * * * 0'   # Every 30 min on Sundays
+
+  # Manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      season:
+        description: 'Season (e.g. 2026)'
+        default: '2026'
+      round:
+        description: 'Round number (e.g. 3)'
+        required: true
+
+jobs:
+  predict:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install numpy pandas scikit-learn xgboost catboost joblib \
+                    fastf1 psycopg2-binary python-dotenv pyarrow requests
+
+      - name: Detect current race
+        id: race
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "season=${{ github.event.inputs.season }}" >> $GITHUB_OUTPUT
+            echo "round=${{ github.event.inputs.round }}" >> $GITHUB_OUTPUT
+          else
+            # Auto-detect: find the next unfinished race
+            python3 -c "
+          import json
+          from data.ingest.openf1_client import OpenF1Client
+          client = OpenF1Client()
+          sessions = client.get_sessions(year=2026, session_type='Race')
+          if not sessions.empty:
+              # Find latest race session
+              latest = sessions.iloc[-1]
+              print(f'round={int(latest.get(\"round\", 3))}')
+          " >> $GITHUB_OUTPUT
+            echo "season=2026" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run predictions
+        run: |
+          python3 -m data.predict_weekend \
+            --season ${{ steps.race.outputs.season }} \
+            --round ${{ steps.race.outputs.round }}
+
+      - name: Upload to Supabase
+        env:
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python3 data/upload_to_supabase.py
+
+      - name: Commit updated predictions
+        run: |
+          git config user.name "FormulAI Bot"
+          git config user.email "bot@formulai.app"
+          git add data/cache/processed/prediction_*.csv data/cache/processed/*.parquet
+          git diff --cached --quiet || git commit -m "Update predictions: R${{ steps.race.outputs.round }} $(date +%Y-%m-%d_%H:%M)"
+          git push

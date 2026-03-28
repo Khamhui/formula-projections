@@ -11,12 +11,15 @@ venv/
 .venv/
 env/
 
-# Data & Cache
-data/cache/
+# Data & Cache (raw API responses)
+data/cache/jolpica/
+data/cache/fastf1/
+data/cache/replays/
 *.csv.gz
-*.parquet
-*.pkl
-*.joblib
+
+# Keep trained models + processed data for CI/CD
+# data/cache/models/ — tracked (needed for predictions)
+# data/cache/processed/ — tracked (feature matrix, standings)
 
 # Jupyter
 .ipynb_checkpoints/
