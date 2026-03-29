@@ -466,14 +466,15 @@ class LiveFeed:
             return None
 
     def start_polling(self):
-        """Start background polling thread."""
+        """Start live data via F1 Live Timing SignalR (free, works during races)."""
         if self._polling:
             return
 
         self._polling = True
-        self._thread = threading.Thread(target=self._poll_loop, daemon=True)
-        self._thread.start()
-        logger.info("Live feed polling started (interval=%.1fs)", self.poll_interval)
+        if self.enable_f1_live_timing():
+            logger.info("F1 Live Timing connected — live data active")
+        else:
+            logger.error("F1 Live Timing failed to connect")
 
     def stop_polling(self):
         """Stop background polling."""
@@ -579,6 +580,13 @@ class LiveFeed:
                 tracked_driver_numbers=self._tracked_drivers,
                 driver_number_map=DRIVER_NUMBER_MAP,
             )
+            # Core race data callbacks
+            self._f1_live_client.on_timing_data(self._on_f1_live_timing_data)
+            self._f1_live_client.on_lap_count(self._on_f1_live_lap_count)
+            self._f1_live_client.on_weather(self._on_f1_live_weather)
+            self._f1_live_client.on_positions(self._on_f1_live_positions)
+            self._f1_live_client.on_race_control(self._on_f1_live_race_control)
+            # Enhancement callbacks
             self._f1_live_client.on_car_status(self._on_f1_live_car_status)
             self._f1_live_client.on_timing_app(self._on_f1_live_timing_app)
 
@@ -610,6 +618,107 @@ class LiveFeed:
         if driver_id not in state.drivers:
             return None
         return state.drivers[driver_id]
+
+    def _ensure_signalr_state(self):
+        """Ensure a RaceState exists for SignalR data to write into."""
+        with self._lock:
+            if self._current_state is None:
+                state = RaceState()
+                state.total_laps = self._total_laps or 53
+                self._current_state = state
+
+    def _on_f1_live_timing_data(self, data: dict):
+        """Core timing: positions, gaps, lap times for all drivers."""
+        self._ensure_signalr_state()
+        with self._lock:
+            state = self._current_state
+            driver_id = data.get("driver_id")
+            if not driver_id:
+                return
+
+            if driver_id not in state.drivers:
+                state.drivers[driver_id] = DriverState(driver_id)
+            ds = state.drivers[driver_id]
+
+            if "position" in data and data["position"] is not None:
+                ds.position = data["position"]
+            if "gap_to_leader" in data:
+                ds.gap_to_leader = data["gap_to_leader"]
+            if "gap_to_ahead" in data:
+                ds.gap_to_ahead = data["gap_to_ahead"]
+            if "is_in_pit" in data:
+                ds.is_in_pit = data["is_in_pit"]
+            if "is_retired" in data:
+                ds.is_retired = True
+                self._retired_drivers.add(driver_id)
+
+            if "last_lap_time_str" in data:
+                try:
+                    parts = data["last_lap_time_str"].split(":")
+                    if len(parts) == 2:
+                        ds.last_lap_time = float(parts[0]) * 60 + float(parts[1])
+                    elif len(parts) == 1 and parts[0]:
+                        ds.last_lap_time = float(parts[0])
+                except (ValueError, IndexError):
+                    pass
+
+    def _on_f1_live_lap_count(self, data: dict):
+        """Update current lap and total laps."""
+        self._ensure_signalr_state()
+        with self._lock:
+            state = self._current_state
+            if "lap" in data:
+                state.lap = data["lap"]
+            if "total_laps" in data:
+                state.total_laps = data["total_laps"]
+                self._total_laps = data["total_laps"]
+
+    def _on_f1_live_weather(self, data: dict):
+        """Update weather conditions."""
+        self._ensure_signalr_state()
+        with self._lock:
+            state = self._current_state
+            if "air_temp" in data:
+                state.air_temp = data["air_temp"]
+            if "track_temp" in data:
+                state.track_temp = data["track_temp"]
+            if "rainfall" in data:
+                state.rainfall = data["rainfall"]
+
+    def _on_f1_live_positions(self, positions: list):
+        """Update GPS positions for track map."""
+        self._ensure_signalr_state()
+        with self._lock:
+            state = self._current_state
+            for pos in positions:
+                did = pos.get("driver_id")
+                if did:
+                    state.driver_locations[did] = (pos["x"], pos["y"])
+
+    def _on_f1_live_race_control(self, data: dict):
+        """Update track status from race control messages."""
+        self._ensure_signalr_state()
+        with self._lock:
+            state = self._current_state
+            flag = str(data.get("Flag", data.get("flag", ""))).lower()
+            status = FLAG_MAP.get(flag, None)
+            if status is None:
+                for key, val in FLAG_MAP.items():
+                    if key in flag:
+                        status = val
+                        break
+            if status:
+                state.track_status = status
+
+            msg = str(data.get("Message", "")).upper()
+            if "RETIRED" in msg or "OUT OF THE RACE" in msg or "STOPPED" in msg:
+                # Try to extract driver number from message
+                for num, did in DRIVER_NUMBER_MAP.items():
+                    code = DRIVER_CODES.get(did, "")
+                    if code and code in msg:
+                        self._retired_drivers.add(did)
+                        if did in state.drivers:
+                            state.drivers[did].is_retired = True
 
     def _on_f1_live_car_status(self, data: dict):
         """Callback from F1 Live Timing — ERS, overtake mode, brake %."""

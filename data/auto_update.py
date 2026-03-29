@@ -233,10 +233,17 @@ def run_update(
         step_features()
 
         print("\nStep 5: Retraining models...")
-        _, metrics = step_train()
-        print(f"  Position MAE: {metrics.get('position_mae', 'N/A')}")
-        print(f"  Podium accuracy: {metrics.get('podium_accuracy', 'N/A')}")
-        print(f"  Winner accuracy: {metrics.get('winner_accuracy', 'N/A')}")
+        try:
+            import warnings
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                _, metrics = step_train()
+            print(f"  Position MAE: {metrics.get('position_mae', 'N/A')}")
+            print(f"  Podium accuracy: {metrics.get('podium_accuracy', 'N/A')}")
+            print(f"  Winner accuracy: {metrics.get('winner_accuracy', 'N/A')}")
+        except Exception as e:
+            print(f"  Retrain failed ({e}), using existing model")
+            metrics = {}
 
         # Update state
         if new_race and new_race.get("key") != "forced":

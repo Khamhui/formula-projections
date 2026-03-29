@@ -188,8 +188,12 @@ def start_live():
         logger.error("Failed to load pre-race predictions: %s", e)
         return jsonify({"error": str(e)}), 500
 
+    if request.is_json and request.json and request.json.get("session_key"):
+        feed.session_key = int(request.json["session_key"])
+        logger.info("Using provided session key: %d", feed.session_key)
+
     feed.start_polling()
-    return jsonify({"status": "polling_started"})
+    return jsonify({"status": "polling_started", "session_key": feed.session_key})
 
 
 @live_bp.route("/stop", methods=["POST"])

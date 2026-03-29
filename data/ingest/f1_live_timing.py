@@ -35,10 +35,16 @@ F1_SIGNALR_BASE = "https://livetiming.formula1.com/signalr"
 F1_SIGNALR_HUB = "Streaming"
 
 TOPICS = [
-    "CarData.z",
-    "CarStatus.z",
-    "TimingAppData",
-    "RaceControlMessages",
+    "TimingData",           # Core: positions, gaps, intervals, sector times, lap times
+    "TimingAppData",        # Extended: tire data, stint info, lap deltas
+    "CarData.z",            # Telemetry: speed, RPM, throttle, brake, gear, DRS
+    "CarStatus.z",          # ERS deployment, overtake mode
+    "RaceControlMessages",  # Flags, incidents, SC, penalties
+    "LapCount",             # Current lap / total laps
+    "SessionStatus",        # Session active, finished, etc.
+    "SessionInfo",          # Session metadata
+    "WeatherData",          # Track/air temp, rainfall, wind
+    "Position.z",           # Driver GPS positions on track
 ]
 
 
@@ -75,6 +81,11 @@ class F1LiveTimingClient:
         self._on_tyre_data: Optional[Callable] = None
         self._on_timing_app: Optional[Callable] = None
         self._on_race_control: Optional[Callable] = None
+        self._on_timing_data: Optional[Callable] = None
+        self._on_lap_count: Optional[Callable] = None
+        self._on_weather: Optional[Callable] = None
+        self._on_positions: Optional[Callable] = None
+        self._on_session_status: Optional[Callable] = None
 
     def set_tracked_drivers(self, driver_numbers: List[int]):
         self._tracked = set(driver_numbers[:3])
@@ -87,6 +98,21 @@ class F1LiveTimingClient:
 
     def on_timing_app(self, callback: Callable):
         self._on_timing_app = callback
+
+    def on_timing_data(self, callback: Callable):
+        self._on_timing_data = callback
+
+    def on_lap_count(self, callback: Callable):
+        self._on_lap_count = callback
+
+    def on_weather(self, callback: Callable):
+        self._on_weather = callback
+
+    def on_positions(self, callback: Callable):
+        self._on_positions = callback
+
+    def on_session_status(self, callback: Callable):
+        self._on_session_status = callback
 
     def on_race_control(self, callback: Callable):
         self._on_race_control = callback
@@ -226,7 +252,9 @@ class F1LiveTimingClient:
         if not isinstance(payload, dict):
             return
 
-        if "CarStatus" in str(topic):
+        if "TimingData" == topic:
+            self._process_timing_data(payload)
+        elif "CarStatus" in str(topic):
             self._process_car_status(payload)
         elif "CarData" in str(topic):
             self._process_car_data(payload)
@@ -235,6 +263,14 @@ class F1LiveTimingClient:
         elif "RaceControlMessages" in str(topic):
             if self._on_race_control:
                 self._on_race_control(payload)
+        elif topic == "LapCount":
+            self._process_lap_count(payload)
+        elif topic == "SessionStatus":
+            self._process_session_status(payload)
+        elif topic == "WeatherData":
+            self._process_weather(payload)
+        elif "Position" in str(topic):
+            self._process_positions(payload)
 
     def _iter_tracked_entries(self, data: dict, key: str = "Entries"):
         """Yield (driver_num, driver_id, entry) for each tracked driver in a feed payload."""
@@ -316,6 +352,130 @@ class F1LiveTimingClient:
 
             if self._on_timing_app:
                 self._on_timing_app(parsed)
+
+    def _process_timing_data(self, data: dict):
+        """Process TimingData — core positions, gaps, intervals, lap/sector times for ALL drivers."""
+        lines = data.get("Lines", data)
+        if not isinstance(lines, dict):
+            return
+
+        for driver_num_str, timing in lines.items():
+            try:
+                driver_num = int(driver_num_str)
+            except (ValueError, TypeError):
+                continue
+
+            driver_id = self._driver_number_map.get(driver_num)
+            if not driver_id:
+                continue
+
+            parsed = {"driver_id": driver_id, "driver_number": driver_num}
+
+            pos = timing.get("Position")
+            if pos is not None:
+                parsed["position"] = int(pos) if isinstance(pos, (int, float, str)) and str(pos).isdigit() else None
+
+            gap = timing.get("GapToLeader")
+            if isinstance(gap, str) and gap.replace(".", "").replace("+", "").isdigit():
+                parsed["gap_to_leader"] = float(gap.replace("+", ""))
+            elif isinstance(gap, (int, float)):
+                parsed["gap_to_leader"] = float(gap)
+
+            interval = timing.get("IntervalToPositionAhead")
+            if isinstance(interval, dict):
+                val = interval.get("Value", "")
+                if isinstance(val, str) and val.replace(".", "").replace("+", "").isdigit():
+                    parsed["gap_to_ahead"] = float(val.replace("+", ""))
+
+            last_lap = timing.get("LastLapTime")
+            if isinstance(last_lap, dict):
+                val = last_lap.get("Value", "")
+                parsed["last_lap_time_str"] = val
+
+            for s in [1, 2, 3]:
+                sector = timing.get(f"Sectors", {})
+                if isinstance(sector, dict):
+                    s_data = sector.get(str(s - 1), {})  # 0-indexed in TimingData
+                    if isinstance(s_data, dict):
+                        val = s_data.get("Value", "")
+                        if val:
+                            parsed[f"sector{s}_str"] = val
+
+            in_pit = timing.get("InPit")
+            if in_pit is not None:
+                parsed["is_in_pit"] = bool(in_pit)
+
+            retired = timing.get("Retired") or timing.get("Stopped")
+            if retired:
+                parsed["is_retired"] = True
+
+            if self._on_timing_data and len(parsed) > 2:
+                self._on_timing_data(parsed)
+
+    def _process_lap_count(self, data: dict):
+        """Process LapCount — current lap number and total laps."""
+        parsed = {}
+        if "CurrentLap" in data:
+            parsed["lap"] = int(data["CurrentLap"])
+        if "TotalLaps" in data:
+            parsed["total_laps"] = int(data["TotalLaps"])
+        if self._on_lap_count and parsed:
+            self._on_lap_count(parsed)
+
+    def _process_session_status(self, data: dict):
+        """Process SessionStatus — active, finished, aborted."""
+        status = data.get("Status", "")
+        if self._on_session_status:
+            self._on_session_status({"status": str(status)})
+
+    def _process_weather(self, data: dict):
+        """Process WeatherData — temperatures, rainfall, wind."""
+        parsed = {}
+        if "AirTemp" in data:
+            try: parsed["air_temp"] = float(data["AirTemp"])
+            except (ValueError, TypeError): pass
+        if "TrackTemp" in data:
+            try: parsed["track_temp"] = float(data["TrackTemp"])
+            except (ValueError, TypeError): pass
+        if "Rainfall" in data:
+            parsed["rainfall"] = str(data["Rainfall"]).lower() in ("1", "true", "yes")
+        if "WindSpeed" in data:
+            try: parsed["wind_speed"] = float(data["WindSpeed"])
+            except (ValueError, TypeError): pass
+        if "Humidity" in data:
+            try: parsed["humidity"] = float(data["Humidity"])
+            except (ValueError, TypeError): pass
+        if self._on_weather and parsed:
+            self._on_weather(parsed)
+
+    def _process_positions(self, data: dict):
+        """Process Position.z — GPS locations for track map."""
+        if isinstance(data, str):
+            data = _decode_z(data)
+        entries = data.get("Position", data)
+        if not isinstance(entries, (list, dict)):
+            return
+
+        positions = []
+        items = entries if isinstance(entries, list) else entries.values()
+        for entry in items:
+            if not isinstance(entry, dict):
+                continue
+            entries_inner = entry.get("Entries", {})
+            for driver_num_str, pos_data in entries_inner.items():
+                try:
+                    driver_num = int(driver_num_str)
+                except (ValueError, TypeError):
+                    continue
+                driver_id = self._driver_number_map.get(driver_num)
+                if driver_id and "X" in pos_data and "Y" in pos_data:
+                    positions.append({
+                        "driver_id": driver_id,
+                        "x": float(pos_data["X"]),
+                        "y": float(pos_data["Y"]),
+                    })
+        if self._on_positions and positions:
+            self._on_positions(positions)
 
     def start(self) -> bool:
         """Start the F1 Live Timing connection in a background thread."""

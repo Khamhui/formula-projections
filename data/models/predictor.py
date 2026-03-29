@@ -134,14 +134,12 @@ class F1Predictor:
 
         self.feature_names = list(X.columns)
 
-        # Fill NaN with column medians — ExtraTrees/CalibratedCV don't handle NaN
+        # Replace inf with NaN, then fill NaN with column medians
+        import numpy as np
+        X = X.replace([np.inf, -np.inf], np.nan)
         self._feature_medians = X.median()
-        if X.isna().any().any():
-            X = X.fillna(self._feature_medians)
-        # Columns still NaN (all-NaN columns where median is NaN) → fill with 0
-        if X.isna().any().any():
-            X = X.fillna(0)
-            self._feature_medians = self._feature_medians.fillna(0)
+        X = X.fillna(self._feature_medians).fillna(0)
+        self._feature_medians = self._feature_medians.fillna(0)
 
         y_podium = (y_position <= 3).astype(int)
         y_winner = (y_position == 1).astype(int)
@@ -156,26 +154,22 @@ class F1Predictor:
         stacking_cv = KFold(n_splits=n_splits, shuffle=False)
 
         def _calibrate(base, y_binary):
-            """Wrap classifier in VennAbersCalibrator (with CalibratedClassifierCV fallback)."""
+            """Wrap classifier in calibrator. Falls back gracefully if calibration fails."""
             min_class = min(y_binary.sum(), len(y_binary) - y_binary.sum())
-            if min_class < 3:
-                logger.warning(
-                    "Too few samples for calibration (min class=%d), using uncalibrated model", min_class
-                )
+            if min_class < 5:
+                logger.warning("Too few samples for calibration (min class=%d), using uncalibrated", min_class)
                 return base
             try:
                 from data.models.venn_abers import VennAbersCalibrator
-                cal_size = int(len(y_binary) * 0.3)
-                if cal_size < 50:
-                    logger.warning(
-                        "Small calibration set (%d samples) — Venn-ABERS may be unreliable", cal_size
-                    )
                 return VennAbersCalibrator(base, cal_fraction=0.3)
+            except Exception:
+                pass
+            try:
+                splits = max(2, min(3, int(min_class // 2)))
+                return CalibratedClassifierCV(base, cv=splits, method="isotonic")
             except Exception as e:
-                logger.warning("Venn-ABERS failed (%s), falling back to isotonic CV", e)
-                splits = max(2, min(3, int(min_class)))
-                cv = TimeSeriesSplit(n_splits=splits)
-                return CalibratedClassifierCV(base, cv=cv, method="isotonic")
+                logger.warning("All calibration failed (%s), using uncalibrated model", e)
+                return base
 
         # Load Optuna-tuned params if available
         tuned = None
@@ -312,11 +306,13 @@ class F1Predictor:
         return selected
 
     def _fill_nan(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Fill NaN with training medians for models that don't handle missing values."""
+        """Fill NaN/inf with training medians for models that don't handle missing values."""
+        import numpy as np
+        X = X.replace([np.inf, -np.inf], np.nan)
         if not X.isna().any().any():
             return X
         if self._feature_medians is not None:
-            return X.fillna(self._feature_medians)
+            return X.fillna(self._feature_medians).fillna(0)
         return X.fillna(0)
 
     def _align_features(self, X: pd.DataFrame) -> pd.DataFrame:
